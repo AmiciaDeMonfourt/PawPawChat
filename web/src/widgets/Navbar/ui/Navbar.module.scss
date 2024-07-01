@@ -1,0 +1,15 @@
+.Navbar {
+    height: var(--navbar-height);
+    width: 100%;
+    background-color: var(--additional-color);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-weight: bold;
+    color: var(--text-color);
+    text-decoration: none;
+}

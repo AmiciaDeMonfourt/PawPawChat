@@ -1,0 +1,26 @@
+.Input {
+    padding: 5px;
+    border: 2px solid var(--inverted-additional-color);
+    &:focus {
+        outline: none;
+    }
+    color: var(--text-color);
+    background-color: inherit;
+}
+
+.wrapper {
+    position: relative;
+}
+
+.pass {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 5px;
+    display: flex;
+    align-items: center;
+
+    & img {
+        height: 20px;
+    }
+}

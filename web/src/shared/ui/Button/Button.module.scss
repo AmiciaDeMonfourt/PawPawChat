@@ -1,0 +1,35 @@
+.Button {
+    cursor: pointer;
+    color: var(--text-color);
+    font: var(--font-small);
+}
+
+.clear {
+    padding: 0;
+    border: none;
+    outline: none;
+    background: none;
+}
+
+.classic {
+    padding: 5px;
+    outline: none;
+    border: 1px solid var(--text-color);
+    background-color: var(--additional-color);
+}
+
+.small {
+    font: var(--font-small);
+}
+
+.medium {
+    font: var(--font-medium);
+}
+
+.large {
+    font: var(--font-large);
+}
+
+.xl {
+    font: var(--font-xl);
+}

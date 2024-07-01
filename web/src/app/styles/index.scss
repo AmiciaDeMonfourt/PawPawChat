@@ -1,0 +1,29 @@
+@import "reset";
+@import "variables/global.scss";
+@import "themes/dark.scss";
+@import "themes/light.scss";
+
+.app {
+    background-color: var(--main-color);
+    min-height: 100vh;
+    color: var(--text-color);
+    font: var(--font-medium);
+    position: relative;
+}
+
+.content-wrapper {
+    display: flex;
+}
+
+.page-wrapper {
+    flex: 1;
+    padding: 20px;
+    min-height: calc(100vh - var(--navbar-height));
+}
+
+.no-select {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}

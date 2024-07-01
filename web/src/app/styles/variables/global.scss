@@ -1,0 +1,30 @@
+@font-face {
+    font-family: 'PawPaw';
+    src: url("shared/assets/fonts/PawPaw-R.woff");
+        // url("shared/assets/fonts/LXGWWenKaiMonoTC-Bold.woff") format("woff"),
+        // url("shared/assets/fonts/LXGWWenKaiMonoTC-Light.woff") format("woff");
+}
+
+:root {
+    //fonts
+    --font-family-main: 'PawPaw', monospace;
+
+    --font-size-xl: 48px;
+    --font-line-xl: 64px;
+    --font-xl: var(--font-size-xl) / var(--font-line-xl) var(--font-family-main);
+
+    --font-size-large: 32px;
+    --font-line-large: 48px;
+    --font-large: var(--font-size-large) / var(--font-line-large) var(--font-family-main);
+
+    --font-size-medium: 24px;
+    --font-line-medium: 32px;
+    --font-medium: var(--font-size-medium) / var(--font-line-medium) var(--font-family-main);
+
+    --font-size-small: 16px;
+    --font-line-small: 24px;
+    --font-small: var(--font-size-small) / var(--font-line-small) var(--font-family-main);
+
+    //sizes
+    --navbar-height: 50px;
+}

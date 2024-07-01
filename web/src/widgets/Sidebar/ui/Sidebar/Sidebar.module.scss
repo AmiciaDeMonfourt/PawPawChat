@@ -1,0 +1,31 @@
+.Sidebar {
+    display: flex;
+    height: calc(100vh - var(--navbar-height));
+    background-color: var(--additional-color);
+    border-right: 1px solid #ccc;
+    position: relative;
+  }
+  
+.SidebarContent {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+.resizer {
+    width: 2px;
+    cursor: ew-resize;
+    background-color: var(--inverted-main-color);
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+.switchers {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  align-items: center;
+  position: absolute;
+  bottom: 10px;
+}
