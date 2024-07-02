@@ -7,14 +7,17 @@ option go_package = "generated/proto/users";
 service UsersService {
     rpc Create(CreateRequest) returns (CreateResponse);
 
-    rpc FindByEmail(FindByEmailRequest) returns (FindByEmailResponse);
+    rpc GetById(GetByIdRequest) returns (GetByIdResponse);
+    
+    rpc GetByEmail(GetByEmailRequest) returns (GetByEmailResponse);
+
+    rpc GetByUsername(GetByUsernameRequest) returns (GetByUsernameResponse);
 }
 
 message User {
     uint64 id       = 1;
     string username = 2;
     string email    = 3;
-    string hashPass = 4;
 }
 
 
@@ -29,12 +32,32 @@ message CreateResponse {
 }
 
 
-message FindByEmailRequest{
+message GetByEmailRequest{
     string email = 1;
 }
-message FindByEmailResponse {
+message GetByEmailResponse {
     User   user  = 1;
     string error = 2;
 }
+
+
+message GetByIdRequest {
+    uint64 id = 1;
+} 
+
+message GetByIdResponse {
+    User   user  = 1;
+    string error = 2;
+}
+
+
+message GetByUsernameRequest {
+    string username = 1;
+} 
+message GetByUsernameResponse {
+    User   user  = 1;
+    string error = 2;
+}
+
 
 

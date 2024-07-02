@@ -67,9 +67,15 @@ func (s *authService) SignUp(ctx context.Context, req *auth.SignUpRequest) (*aut
 
 func (s authService) SignIn(ctx context.Context, req *auth.SignInRequest) (*auth.SignInResponse, error) {
 	// Parse request and finding the user with the same credentials
-	resp, err := s.client.Users().FindByEmail(ctx, &users.FindByEmailRequest{Email: req.GetEmail()})
+	resp, err := s.client.Users().GetByEmail(ctx, &users.GetByEmailRequest{Email: req.GetEmail()})
 	if err != nil {
 		return &auth.SignInResponse{Error: err.Error()}, nil
+	}
+
+	// Generate token
+	tokenStr, err := jwt.GenerateToken(resp.User.GetId())
+	if err != nil {
+		return nil, nil
 	}
 
 	// Check is user exists
@@ -77,12 +83,6 @@ func (s authService) SignIn(ctx context.Context, req *auth.SignInRequest) (*auth
 		return &auth.SignInResponse{
 			Error: "not find user with this email",
 		}, nil
-	}
-
-	// Generate token
-	tokenStr, err := jwt.GenerateToken(resp.GetUser().Id)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to generate jwt token: %s", err.Error())
 	}
 
 	// Return token and user
@@ -96,11 +96,11 @@ func (s authService) SignIn(ctx context.Context, req *auth.SignInRequest) (*auth
 	}, nil
 }
 
-func (s *authService) CheckToken(ctx context.Context, req *auth.CheckTokenRequest) (*auth.CheckTokenResponse, error) {
+func (s *authService) CheckAuth(ctx context.Context, req *auth.CheckAuthRequest) (*auth.CheckAuthResponse, error) {
 	// Get token from request and checking it on correctness
-	if err := jwt.CheckToken(req.GetTokenStr()); err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "invalid toker: %s", err.Error())
-	}
+	// if err := jwt.CheckToken(req.GetTokenStr()); err != nil {
+	// 	return nil, status.Errorf(codes.Unauthenticated, "invalid toker: %s", err.Error())
+	// }
 
-	return &auth.CheckTokenResponse{}, nil
+	return &auth.CheckAuthResponse{}, nil
 }

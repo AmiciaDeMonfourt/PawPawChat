@@ -20,7 +20,7 @@ func GenerateToken(userId uint64) (string, error) {
 	return tokenStr, nil
 }
 
-func CheckToken(tokenStr string) error {
+func checkToken(tokenStr string) error {
 	token, err := jwt.Parse(tokenStr, keyFunc)
 
 	if err != nil || !token.Valid {
@@ -32,4 +32,8 @@ func CheckToken(tokenStr string) error {
 
 func keyFunc(*jwt.Token) (interface{}, error) {
 	return signedKey, nil
+}
+
+func CheckAuth(tokenStr string) error {
+	return checkToken(tokenStr)
 }

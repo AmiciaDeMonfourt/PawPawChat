@@ -16,7 +16,7 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/signin": {
-            "get": {
+            "post": {
                 "description": "Authorization",
                 "summary": "Sign in",
                 "parameters": [
@@ -95,6 +95,41 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/{username}": {
+            "get": {
+                "description": "User's page",
+                "summary": "Page",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/users.GetByUsernameResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.HTTPError"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -141,6 +176,31 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "users.GetByUsernameResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/users.User"
+                }
+            }
+        },
+        "users.User": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "username": {
                     "type": "string"
                 }
             }

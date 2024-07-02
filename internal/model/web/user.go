@@ -23,3 +23,12 @@ type UserSignInResponse struct {
 	TokenStr string      `json:"token_string"`
 	Error    string      `json:"error,omitempty"`
 }
+
+type PageRequest struct {
+	TokenStr string `json:"token_string"`
+}
+
+type PageResponse struct {
+	User  domain.User `json:"user"`
+	Error string      `json:"error,omitempty"`
+}

@@ -25,7 +25,7 @@ func (s *UsersService) Create(ctx context.Context, req *users.CreateRequest) (*u
 		return nil, status.Errorf(codes.InvalidArgument, "incorrect user data: %v", err)
 	}
 
-	existingUser, err := s.db.User().FindByEmail(user.Email)
+	existingUser, err := s.db.User().GetByEmail(user.Email)
 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "database error: %v", err)
@@ -51,24 +51,65 @@ func (s *UsersService) Create(ctx context.Context, req *users.CreateRequest) (*u
 	}, nil
 }
 
-func (s *UsersService) FindByEmail(ctx context.Context, req *users.FindByEmailRequest) (*users.FindByEmailResponse, error) {
-	user, err := s.db.User().FindByEmail(req.GetEmail())
+func (s *UsersService) GetByEmail(ctx context.Context, req *users.GetByEmailRequest) (*users.GetByEmailResponse, error) {
+	user, err := s.db.User().GetByEmail(req.GetEmail())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	if user == nil {
-		return &users.FindByEmailResponse{
-			Error: "failed find user with this email",
+		return &users.GetByEmailResponse{
+			Error: "failed Get user with this email",
 		}, nil
 	}
 
-	return &users.FindByEmailResponse{
+	return &users.GetByEmailResponse{
 		User: &users.User{
 			Id:       user.ID,
 			Username: user.Username,
 			Email:    user.Email,
-			HashPass: user.HashPass,
+		},
+	}, nil
+}
+
+func (s *UsersService) GetById(ctx context.Context, req *users.GetByIdRequest) (*users.GetByIdResponse, error) {
+	user, err := s.db.User().GetById(req.GetId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	if user == nil {
+		return &users.GetByIdResponse{
+			Error: "not found",
+		}, nil
+	}
+
+	return &users.GetByIdResponse{
+		User: &users.User{
+			Id:       user.ID,
+			Username: user.Username,
+			Email:    user.Email,
+		},
+	}, nil
+}
+
+func (s *UsersService) GetByUsername(ctx context.Context, req *users.GetByUsernameRequest) (*users.GetByUsernameResponse, error) {
+	user, err := s.db.User().GetByUsername(req.GetUsername())
+	if err != nil {
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	if user == nil {
+		return &users.GetByUsernameResponse{
+			Error: "not found",
+		}, nil
+	}
+
+	return &users.GetByUsernameResponse{
+		User: &users.User{
+			Id:       user.ID,
+			Username: user.Username,
+			Email:    user.Email,
 		},
 	}, nil
 }

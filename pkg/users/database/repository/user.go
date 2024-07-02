@@ -36,7 +36,7 @@ func (r *UserRepository) Create(user *model.User) error {
 	return nil
 }
 
-func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
+func (r *UserRepository) GetByEmail(email string) (*model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -46,12 +46,12 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 
 	var user model.User
 	query := `
-		SELECT id, username, hash_pass
+		SELECT id, username
 		FROM users
 		WHERE email = $1
 	`
 
-	err := r.db.QueryRowContext(ctx, query, email).Scan(&user.ID, &user.Username, &user.HashPass)
+	err := r.db.QueryRowContext(ctx, query, email).Scan(&user.ID, &user.Username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
@@ -60,6 +60,54 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	}
 
 	user.Email = email
+
+	return &user, nil
+}
+
+func (r *UserRepository) GetById(id uint64) (*model.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var user model.User
+	query := `
+		SELECT email, username  
+		FROM users 
+		WHERE id = $1
+	`
+
+	err := r.db.QueryRowContext(ctx, query, id).Scan(&user.Email, &user.Username)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	user.ID = id
+
+	return &user, nil
+}
+
+func (r *UserRepository) GetByUsername(username string) (*model.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var user model.User
+	query := `
+		SELECT id, email 
+		FROM users 
+		WHERE username = $1
+	`
+
+	err := r.db.QueryRowContext(ctx, query, username).Scan(&user.ID, &user.Email)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	user.Username = username
 
 	return &user, nil
 }
