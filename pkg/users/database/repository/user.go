@@ -28,7 +28,7 @@ func (r *UserRepository) Create(user *model.User) error {
 		RETURNING id
     `
 
-	err := r.db.QueryRowContext(ctx, query, user.Username, user.Email, user.Password).Scan(&user.ID)
+	err := r.db.QueryRowContext(ctx, query, user.Username, user.Email, user.HashPass).Scan(&user.ID)
 	if err != nil {
 		return err
 	}
@@ -110,4 +110,26 @@ func (r *UserRepository) GetByUsername(username string) (*model.User, error) {
 	user.Username = username
 
 	return &user, nil
+}
+
+func (r *UserRepository) GetHashPass(email string) (string, error) {
+	if email == "" {
+		return "", nil
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var hashPass string
+	query := `SELECT hash_pass FROM users WHERE email = $1`
+
+	err := r.db.QueryRowContext(ctx, query, email).Scan(&hashPass)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", nil
+		}
+		return "", err
+	}
+
+	return hashPass, nil
 }

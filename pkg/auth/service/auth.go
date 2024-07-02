@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"log"
 	"pawpawchat/generated/proto/auth"
 	"pawpawchat/generated/proto/users"
 	"pawpawchat/pkg/auth/client"
@@ -66,24 +65,32 @@ func (s *authService) SignUp(ctx context.Context, req *auth.SignUpRequest) (*aut
 	}, nil
 }
 
-func (s authService) SignIn(ctx context.Context, req *auth.SignInRequest) (*auth.SignInResponse, error) {
+func (s *authService) SignIn(ctx context.Context, req *auth.SignInRequest) (*auth.SignInResponse, error) {
 	// Parse request and finding the user with the same credentials
 	resp, err := s.client.Users().GetByEmail(ctx, &users.GetByEmailRequest{Email: req.GetEmail()})
 	if err != nil {
 		return &auth.SignInResponse{Error: err.Error()}, nil
 	}
 
+	// Check is user exists
+	if resp.GetUser() == nil {
+		return &auth.SignInResponse{Error: "not find user with this email"}, nil
+	}
+
+	// Check user credentials
+	checkCredentialResp, err := s.client.Users().CheckCredentials(context.TODO(), &users.CheckCredentialsRequest{Email: req.GetEmail(), Password: req.GetPassword()})
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if err := checkCredentialResp.GetError(); err != "" {
+		return &auth.SignInResponse{Error: err}, nil
+	}
+
 	// Generate token
 	tokenStr, err := jwt.GenerateToken(resp.User.GetId())
 	if err != nil {
 		return nil, nil
-	}
-
-	// Check is user exists
-	if resp.GetUser() == nil {
-		return &auth.SignInResponse{
-			Error: "not find user with this email",
-		}, nil
 	}
 
 	// Return token and user
@@ -98,18 +105,15 @@ func (s authService) SignIn(ctx context.Context, req *auth.SignInRequest) (*auth
 }
 
 func (s *authService) CheckAuth(ctx context.Context, req *auth.CheckAuthRequest) (*auth.CheckAuthResponse, error) {
-	log.Println("CheckAuth in AuthService begin")
 	if req == nil || req.GetTokenStr() == "" {
 		return nil, status.Error(codes.InvalidArgument, "missing or empty token")
 	}
 
-	log.Println("jwt.ExtractUserId: tokenStr:", req.GetTokenStr())
 	id, err := jwt.ExtractUserId(req.GetTokenStr())
 	if err != nil {
 		return nil, err
 	}
 
-	log.Println("CheckAuth in AuthService end. UserId: ", id)
 	return &auth.CheckAuthResponse{
 		Userid: id,
 	}, nil

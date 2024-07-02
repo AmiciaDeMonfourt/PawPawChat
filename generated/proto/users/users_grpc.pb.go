@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	UsersService_Create_FullMethodName        = "/users.UsersService/Create"
-	UsersService_GetById_FullMethodName       = "/users.UsersService/GetById"
-	UsersService_GetByEmail_FullMethodName    = "/users.UsersService/GetByEmail"
-	UsersService_GetByUsername_FullMethodName = "/users.UsersService/GetByUsername"
+	UsersService_Create_FullMethodName           = "/users.UsersService/Create"
+	UsersService_CheckCredentials_FullMethodName = "/users.UsersService/CheckCredentials"
+	UsersService_GetById_FullMethodName          = "/users.UsersService/GetById"
+	UsersService_GetByEmail_FullMethodName       = "/users.UsersService/GetByEmail"
+	UsersService_GetByUsername_FullMethodName    = "/users.UsersService/GetByUsername"
 )
 
 // UsersServiceClient is the client API for UsersService service.
@@ -30,6 +31,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UsersServiceClient interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
+	CheckCredentials(ctx context.Context, in *CheckCredentialsRequest, opts ...grpc.CallOption) (*CheckCredentialsResponse, error)
 	GetById(ctx context.Context, in *GetByIdRequest, opts ...grpc.CallOption) (*GetByIdResponse, error)
 	GetByEmail(ctx context.Context, in *GetByEmailRequest, opts ...grpc.CallOption) (*GetByEmailResponse, error)
 	GetByUsername(ctx context.Context, in *GetByUsernameRequest, opts ...grpc.CallOption) (*GetByUsernameResponse, error)
@@ -47,6 +49,16 @@ func (c *usersServiceClient) Create(ctx context.Context, in *CreateRequest, opts
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateResponse)
 	err := c.cc.Invoke(ctx, UsersService_Create_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersServiceClient) CheckCredentials(ctx context.Context, in *CheckCredentialsRequest, opts ...grpc.CallOption) (*CheckCredentialsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckCredentialsResponse)
+	err := c.cc.Invoke(ctx, UsersService_CheckCredentials_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +100,7 @@ func (c *usersServiceClient) GetByUsername(ctx context.Context, in *GetByUsernam
 // for forward compatibility
 type UsersServiceServer interface {
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
+	CheckCredentials(context.Context, *CheckCredentialsRequest) (*CheckCredentialsResponse, error)
 	GetById(context.Context, *GetByIdRequest) (*GetByIdResponse, error)
 	GetByEmail(context.Context, *GetByEmailRequest) (*GetByEmailResponse, error)
 	GetByUsername(context.Context, *GetByUsernameRequest) (*GetByUsernameResponse, error)
@@ -100,6 +113,9 @@ type UnimplementedUsersServiceServer struct {
 
 func (UnimplementedUsersServiceServer) Create(context.Context, *CreateRequest) (*CreateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (UnimplementedUsersServiceServer) CheckCredentials(context.Context, *CheckCredentialsRequest) (*CheckCredentialsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckCredentials not implemented")
 }
 func (UnimplementedUsersServiceServer) GetById(context.Context, *GetByIdRequest) (*GetByIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetById not implemented")
@@ -137,6 +153,24 @@ func _UsersService_Create_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UsersServiceServer).Create(ctx, req.(*CreateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UsersService_CheckCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckCredentialsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).CheckCredentials(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_CheckCredentials_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).CheckCredentials(ctx, req.(*CheckCredentialsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -205,6 +239,10 @@ var UsersService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Create",
 			Handler:    _UsersService_Create_Handler,
+		},
+		{
+			MethodName: "CheckCredentials",
+			Handler:    _UsersService_CheckCredentials_Handler,
 		},
 		{
 			MethodName: "GetById",
