@@ -1,0 +1,89 @@
+definitions:
+  auth.SignInRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  auth.SignInResponse:
+    properties:
+      error:
+        type: string
+      tokenStr:
+        type: string
+      user:
+        $ref: '#/definitions/auth.User'
+    type: object
+  auth.User:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+  response.HTTPError:
+    properties:
+      error:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Service API
+paths:
+  /signin:
+    get:
+      description: Authorization
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Credentials
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SignInRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.SignInResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+      summary: Sign in
+  /signup:
+    post:
+      description: Registration
+      parameters:
+      - description: Credentials
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SignInRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.SignInResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+      summary: Sign up
+swagger: "2.0"

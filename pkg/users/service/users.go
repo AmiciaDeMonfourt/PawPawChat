@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"log"
 	"pawpawchat/generated/proto/users"
 	db "pawpawchat/pkg/users/database"
 	"pawpawchat/pkg/users/model"
@@ -21,14 +20,12 @@ func New(db *db.DataBase) *UsersService {
 }
 
 func (s *UsersService) Create(ctx context.Context, req *users.CreateRequest) (*users.CreateResponse, error) {
-	// Create user model
 	user, err := model.NewUser(req)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "incorrect user data: %v", err)
 	}
 
-	// Check email on once using
-	existingUser, err := s.db.User().FindByEmail(req.GetEmail())
+	existingUser, err := s.db.User().FindByEmail(user.Email)
 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "database error: %v", err)
@@ -36,20 +33,16 @@ func (s *UsersService) Create(ctx context.Context, req *users.CreateRequest) (*u
 
 	if existingUser != nil {
 		return &users.CreateResponse{
-			Status: "error",
-			Error:  "user with this email already exists",
+			Error: "user with this email already exists",
 		}, nil
 	}
 
-	// Add new item in database
 	err = s.db.User().Create(user)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
 	}
 
-	// Return
 	return &users.CreateResponse{
-		Status: "success",
 		User: &users.User{
 			Id:       user.ID,
 			Username: user.Username,
@@ -64,17 +57,13 @@ func (s *UsersService) FindByEmail(ctx context.Context, req *users.FindByEmailRe
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	log.Printf("FindByEmail: %v", user)
-
 	if user == nil {
-		log.Println("user is nil")
 		return &users.FindByEmailResponse{
-			Status: "not find",
+			Error: "failed find user with this email",
 		}, nil
 	}
 
 	return &users.FindByEmailResponse{
-		Status: "success",
 		User: &users.User{
 			Id:       user.ID,
 			Username: user.Username,

@@ -5,9 +5,11 @@ import (
 	"pawpawchat/internal/grpcclient"
 	"pawpawchat/internal/middleware"
 	"pawpawchat/internal/router/routes"
-	userroutes "pawpawchat/internal/router/routes/user"
+
+	_ "pawpawchat/docs"
 
 	"github.com/gorilla/mux"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
 type Router struct {
@@ -19,12 +21,13 @@ type Router struct {
 func New(client *grpcclient.Client) *Router {
 	return &Router{
 		router:      mux.NewRouter(),
-		user:        userroutes.New(client),
+		user:        routes.NewUserRoutes(client),
 		middlewares: make([]middleware.Middleware, 0),
 	}
 }
 
 func (r *Router) Configure() {
+	r.router.PathPrefix("/swagger/").HandlerFunc(httpSwagger.WrapHandler)
 	r.Use(middleware.CORS)
 	r.Use(middleware.Logging)
 

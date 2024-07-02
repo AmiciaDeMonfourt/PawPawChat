@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
 	"pawpawchat/pkg/users/model"
 	"time"
 )
@@ -24,9 +23,9 @@ func (r *UserRepository) Create(user *model.User) error {
 	defer cancel()
 
 	query := `
-        INSERT INTO users (username, email, hash_pass) 
-        VALUES ($1, $2, $3) 
-        RETURNING id
+		INSERT INTO users (username, email, hash_pass)
+		VALUES ($1, $2, $3)
+		RETURNING id
     `
 
 	err := r.db.QueryRowContext(ctx, query, user.Username, user.Email, user.Password).Scan(&user.ID)
@@ -61,8 +60,6 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	}
 
 	user.Email = email
-
-	log.Printf("Users UserRepository: finding user: %v", user)
 
 	return &user, nil
 }

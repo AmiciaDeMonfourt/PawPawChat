@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"log"
 	"pawpawchat/generated/proto/auth"
 	"pawpawchat/generated/proto/users"
 	"pawpawchat/pkg/auth/client"
@@ -33,8 +32,10 @@ func (s *authService) SignUp(ctx context.Context, req *auth.SignUpRequest) (*aut
 	// Parse request, passing data to 'users' microservice to create a new user
 	createResp, err := s.client.Users().Create(ctx, &users.CreateRequest{
 		Email:    req.GetEmail(),
+		Username: req.GetUsername(),
 		Password: req.GetPassword(),
 	})
+
 	// Check internal errors
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -52,8 +53,6 @@ func (s *authService) SignUp(ctx context.Context, req *auth.SignUpRequest) (*aut
 	if err != nil {
 		return nil, status.Error(codes.Aborted, err.Error())
 	}
-
-	log.Printf("authService: createResp: %v", createResp)
 
 	// Return token string and users credentials
 	return &auth.SignUpResponse{
@@ -103,7 +102,5 @@ func (s *authService) CheckToken(ctx context.Context, req *auth.CheckTokenReques
 		return nil, status.Errorf(codes.Unauthenticated, "invalid toker: %s", err.Error())
 	}
 
-	return &auth.CheckTokenResponse{
-		Status: "success",
-	}, nil
+	return &auth.CheckTokenResponse{}, nil
 }

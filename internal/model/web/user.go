@@ -8,7 +8,9 @@ type UserSignUpRequest struct {
 }
 
 type UserSignUpResponse struct {
-	TokenStr string `json:"token_string"`
+	User     domain.User `json:"user"`
+	TokenStr string      `json:"token_string"`
+	Error    string      `json:"error,omitempty"`
 }
 
 type UserSignInRequest struct {
@@ -17,7 +19,7 @@ type UserSignInRequest struct {
 }
 
 type UserSignInResponse struct {
+	User     domain.User `json:"user"`
 	TokenStr string      `json:"token_string"`
 	Error    string      `json:"error,omitempty"`
-	User     domain.User `json:"user"`
 }

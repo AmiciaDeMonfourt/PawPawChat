@@ -5,6 +5,8 @@ import (
 	"pawpawchat/internal/server"
 )
 
+// @Title Service API
+// @Port 8080
 func main() {
 	err := server.Start()
 	if err != nil {
