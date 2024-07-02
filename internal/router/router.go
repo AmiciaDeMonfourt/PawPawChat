@@ -16,6 +16,7 @@ type Router struct {
 	middlewares []middleware.Middleware
 	router      *mux.Router
 	user        routes.User
+	client      *grpcclient.Client
 }
 
 func New(client *grpcclient.Client) *Router {
@@ -23,6 +24,7 @@ func New(client *grpcclient.Client) *Router {
 		router:      mux.NewRouter(),
 		user:        routes.NewUserRoutes(client),
 		middlewares: make([]middleware.Middleware, 0),
+		client:      client,
 	}
 }
 
@@ -35,13 +37,12 @@ func (r *Router) Configure() {
 func (r *Router) configureUserRoutes() {
 	r.router.HandleFunc("/signup", r.user.SignUp).Methods("POST")
 	r.router.HandleFunc("/signin", r.user.SignIn).Methods("POST")
-	r.router.HandleFunc("/{username}", r.user.Page).Methods("GET")
+	r.router.HandleFunc("/{username}", middleware.Auth(r.client, r.user.Page)).Methods("GET")
 }
 
 func (r *Router) configureMiddlewares() {
 	r.Use(middleware.CORS)
 	r.Use(middleware.Logging)
-
 }
 
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {

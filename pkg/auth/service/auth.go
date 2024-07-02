@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 	"pawpawchat/generated/proto/auth"
 	"pawpawchat/generated/proto/users"
 	"pawpawchat/pkg/auth/client"
@@ -97,10 +98,19 @@ func (s authService) SignIn(ctx context.Context, req *auth.SignInRequest) (*auth
 }
 
 func (s *authService) CheckAuth(ctx context.Context, req *auth.CheckAuthRequest) (*auth.CheckAuthResponse, error) {
-	// Get token from request and checking it on correctness
-	// if err := jwt.CheckToken(req.GetTokenStr()); err != nil {
-	// 	return nil, status.Errorf(codes.Unauthenticated, "invalid toker: %s", err.Error())
-	// }
+	log.Println("CheckAuth in AuthService begin")
+	if req == nil || req.GetTokenStr() == "" {
+		return nil, status.Error(codes.InvalidArgument, "missing or empty token")
+	}
 
-	return &auth.CheckAuthResponse{}, nil
+	log.Println("jwt.ExtractUserId: tokenStr:", req.GetTokenStr())
+	id, err := jwt.ExtractUserId(req.GetTokenStr())
+	if err != nil {
+		return nil, err
+	}
+
+	log.Println("CheckAuth in AuthService end. UserId: ", id)
+	return &auth.CheckAuthResponse{
+		Userid: id,
+	}, nil
 }
