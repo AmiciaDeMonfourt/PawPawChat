@@ -7,42 +7,50 @@ import (
 	"pawpawchat/generated/proto/auth"
 	"pawpawchat/generated/proto/users"
 	"pawpawchat/internal/grpcclient"
+	"pawpawchat/internal/middleware"
+	"pawpawchat/internal/model/domain"
+	"pawpawchat/internal/model/web"
 	"pawpawchat/internal/server/response"
 
 	"github.com/gorilla/mux"
 )
 
 type userRoutes struct {
-	client *grpcclient.Client
+	gRPCClient *grpcclient.Client
 }
 
-func NewUserRoutes(client *grpcclient.Client) *userRoutes {
+func NewUserRoutes(gRPCClient *grpcclient.Client) *userRoutes {
 	return &userRoutes{
-		client: client,
+		gRPCClient: gRPCClient,
 	}
 }
 
 // @Summary      Sign up
 // @Description  Registration
-// @Param        requestBody    body      auth.SignInRequest	true	"Credentials"
-// @Success      200  			{object}   auth.SignInResponse
-// @Failure      400  			{object}  response.HTTPError
+// @Param        requestBody    body       auth.SignInRequest	true	"Credentials"
+// @Success      201  			{object}   auth.SignInResponse
+// @Failure      409  			{object}  response.HTTPError
 // @Failure      500  			{object}  response.HTTPError
 // @Router       /signup [post]
 func (r *userRoutes) SignUp(w http.ResponseWriter, req *http.Request) {
 	signUpReq := new(auth.SignUpRequest)
 	if err := json.NewDecoder(req.Body).Decode(&signUpReq); err != nil {
-		response.BadReq(w, err)
+		response.BadReq(w, err.Error())
 		return
 	}
 
-	singnUpResp, err := r.client.Auth().SignUp(context.TODO(), signUpReq)
+	signUpResp, err := r.gRPCClient.Auth().SignUp(context.TODO(), signUpReq)
 	if err != nil {
-		response.InternalErr(w, err)
+		response.InternalErr(w, err.Error())
 		return
 	}
 
-	response.Created(w, singnUpResp)
+	if signUpResp.GetError() != "" {
+		response.Conflict(w, signUpResp.GetError())
+		return
+	}
+
+	response.Created(w, signUpResp)
 }
 
 // @Summary      Sign in
@@ -50,23 +58,28 @@ func (r *userRoutes) SignUp(w http.ResponseWriter, req *http.Request) {
 // @Param        Authorization  header    string              	true  "Token"
 // @Param        requestBody    body      auth.SignInRequest	true  "Credentials"
 // @Success      200  			{object}  auth.SignInResponse
-// @Failure      400  			{object}  response.HTTPError
+// @Failure      404  			{object}  response.HTTPError
 // @Failure      500  			{object}  response.HTTPError
 // @Router       /signin [post]
 func (r *userRoutes) SignIn(w http.ResponseWriter, req *http.Request) {
 	signInReq := new(auth.SignInRequest)
 	if err := json.NewDecoder(req.Body).Decode(&signInReq); err != nil {
-		response.BadReq(w, err)
+		response.BadReq(w, err.Error())
 		return
 	}
 
-	signResp, err := r.client.Auth().SignIn(context.TODO(), signInReq)
+	signInResp, err := r.gRPCClient.Auth().SignIn(context.TODO(), signInReq)
 	if err != nil {
-		response.InternalErr(w, err)
+		response.InternalErr(w, err.Error())
 		return
 	}
 
-	response.OK(w, signResp)
+	if signInResp.GetError() != "" {
+		response.Forbidden(w, signInResp.GetError())
+		return
+	}
+
+	response.OK(w, signInResp)
 }
 
 // @Summary      Page
@@ -79,16 +92,47 @@ func (r *userRoutes) SignIn(w http.ResponseWriter, req *http.Request) {
 func (r *userRoutes) Page(w http.ResponseWriter, req *http.Request) {
 	username := mux.Vars(req)["username"]
 
-	user, err := r.client.Users().GetByUsername(context.TODO(), &users.GetByUsernameRequest{Username: username})
+	user, err := r.gRPCClient.Users().GetByUsername(context.TODO(), &users.GetByUsernameRequest{Username: username})
 	if err != nil {
-		response.BadReq(w, err)
+		response.BadReq(w, err.Error())
 		return
 	}
 
 	if user == nil {
-		response.NotFound(w, err)
+		response.NotFound(w, err.Error())
 		return
 	}
 
 	response.OK(w, user)
+}
+
+// @Summary      User
+// @Description  User info
+// @Param        Authorization  header    string            	true	"Token"
+// @Success      200  			{object}  web.UserResponse
+// @Failure      404  			{object}  response.HTTPError
+// @Failure      500  			{object}  response.HTTPError
+// @Router       /api/user [get]
+func (r *userRoutes) User(w http.ResponseWriter, req *http.Request) {
+	id := req.Context().Value(middleware.CtxString("user_id"))
+
+	getByIdParams := &users.GetByIdRequest{Id: id.(uint64)}
+	usersResp, err := r.gRPCClient.Users().GetById(context.TODO(), getByIdParams)
+	if err != nil {
+		response.NotFound(w, err.Error())
+		return
+	}
+
+	if usersResp.GetError() != "" {
+		response.InternalErr(w, usersResp.GetError())
+		return
+	}
+
+	user := domain.NewUser(usersResp)
+	if user == nil {
+		response.InternalErr(w, "could not create a user model")
+		return
+	}
+
+	response.OK(w, web.UserResponse{User: *user})
 }

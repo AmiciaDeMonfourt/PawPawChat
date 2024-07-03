@@ -2,46 +2,56 @@ package response
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
-func writeJSONResponse(w http.ResponseWriter, code int, data interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(data)
+type HTTPError struct {
+	Error string `json:"error"`
 }
 
-// SUCCESS
+func jsonResponse(w http.ResponseWriter, statusCode int, data interface{}) {
+	w.WriteHeader(statusCode)
+	if data != nil {
+		err := json.NewEncoder(w).Encode(data)
+		if err != nil {
+			log.Printf("could not encode data: %v\nerror: %v", data, err)
+		}
+	}
+}
+
 func OK(w http.ResponseWriter, data interface{}) {
-	writeJSONResponse(w, http.StatusOK, data)
+	jsonResponse(w, http.StatusOK, data)
 }
 
 func Created(w http.ResponseWriter, data interface{}) {
-	writeJSONResponse(w, http.StatusCreated, data)
+	jsonResponse(w, http.StatusCreated, data)
 }
 
-// FAILED
-func BadReq(w http.ResponseWriter, err error) {
-	writeJSONResponse(w, http.StatusBadRequest, &HTTPError{Error: err.Error()})
+func HTTPErrorResp(w http.ResponseWriter, statusCode int, errMsg string) {
+	jsonResponse(w, statusCode, &HTTPError{Error: errMsg})
 }
 
-func InternalErr(w http.ResponseWriter, err error) {
-	writeJSONResponse(w, http.StatusInternalServerError, &HTTPError{Error: err.Error()})
+func BadReq(w http.ResponseWriter, errMsg string) {
+	HTTPErrorResp(w, http.StatusBadRequest, errMsg)
 }
 
-func NotFound(w http.ResponseWriter, err error) {
-	writeJSONResponse(w, http.StatusNotFound, &HTTPError{Error: err.Error()})
+func Conflict(w http.ResponseWriter, errMsg string) {
+	HTTPErrorResp(w, http.StatusConflict, errMsg)
 }
 
-func Unauthorized(w http.ResponseWriter, err error) {
-	writeJSONResponse(w, http.StatusUnauthorized, &HTTPError{Error: err.Error()})
+func Forbidden(w http.ResponseWriter, errMsg string) {
+	HTTPErrorResp(w, http.StatusForbidden, errMsg)
 }
 
-func NoContent(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusNoContent)
+func InternalErr(w http.ResponseWriter, errMsg string) {
+	HTTPErrorResp(w, http.StatusInternalServerError, errMsg)
 }
 
-// MODELS FOR SWAGGER
-type HTTPError struct {
-	Error string `json:"error"`
+func NotFound(w http.ResponseWriter, errMsg string) {
+	HTTPErrorResp(w, http.StatusNotFound, errMsg)
+}
+
+func Unauthorized(w http.ResponseWriter, errMsg string) {
+	HTTPErrorResp(w, http.StatusUnauthorized, errMsg)
 }

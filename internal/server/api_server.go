@@ -4,17 +4,32 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"pawpawchat/config"
+	"os"
+	"path/filepath"
+
+	"github.com/joho/godotenv"
 )
 
-func Start() error {
-	server := newServer()
-	listener, err := net.Listen("tcp", config.App().AppAddr)
+func init() {
+	wd, err := os.Getwd()
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
-	log.Printf("app service server start at %s", config.App().AppAddr)
+	err = godotenv.Load(filepath.Join(wd, ".env"))
+	if err != nil {
+		log.Fatal("Error loading .env file:", err)
+	}
+}
 
-	return http.Serve(listener, server)
+func Start() {
+	server := newServer()
+	listener, err := net.Listen("tcp", os.Getenv("APP_ADDR"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("app service server start at %s", os.Getenv("APP_ADDR"))
+
+	http.Serve(listener, server)
 }

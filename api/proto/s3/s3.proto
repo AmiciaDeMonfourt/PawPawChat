@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package s3;
+
+option go_package = "generated/proto/s3";
+
+service s3Service {
+    rpc SinglePartUpload(SinglePartUploadRequest) returns (SinglePartUploadResponse);
+
+    rpc StreamUpload(stream StreamUploadRequest) returns (StreamUploadResponse);
+
+    rpc GetUploadURL(GetUploadURLRequest) returns (GetUploadURLResponse);
+
+    rpc GetDownloadURL(GetDownloadRequest) returns (GetDownloadResponse);
+}
+
+message SinglePartUploadRequest {
+    bytes  media  = 1;
+    string key    = 2;
+    string bucket = 3;
+}
+message SinglePartUploadResponse {
+    string URL   = 1;   
+    string error = 2;
+}
+
+message GetUploadURLRequest {
+    string key    = 1;
+    string bucket = 2;
+} 
+message GetUploadURLResponse {
+    string URL   = 1;
+    string error = 2;    
+}
+
+message GetDownloadRequest {
+    string key    = 1;
+    string bucket = 2;
+} 
+message GetDownloadResponse {
+    string URL   = 1;
+    string error = 2;    
+}
+
+
+message StreamUploadRequest {
+    bytes  chunk  = 1;
+    string key    = 2;
+    string bucket = 3;
+}
+
+message StreamUploadResponse {
+    string URL   = 1;
+    string error = 2;    
+}
+

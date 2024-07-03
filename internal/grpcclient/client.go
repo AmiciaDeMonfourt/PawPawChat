@@ -1,7 +1,7 @@
 package grpcclient
 
 import (
-	"pawpawchat/config"
+	"os"
 	"pawpawchat/generated/proto/auth"
 	"pawpawchat/generated/proto/users"
 
@@ -15,12 +15,12 @@ type Client struct {
 }
 
 func New() (*Client, error) {
-	usersConn, err := grpc.NewClient(config.App().UsersAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	usersConn, err := grpc.NewClient(os.Getenv("USERS_ADDR"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
 
-	authConn, err := grpc.NewClient(config.App().AuthAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	authConn, err := grpc.NewClient(os.Getenv("AUTH_ADDR"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
