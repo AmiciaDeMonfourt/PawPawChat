@@ -7,15 +7,15 @@ import { $api } from "shared/config/axoisConfig/axiosConfig";
 import axios, { AxiosError } from "axios";
 
 export const SignUp = createAsyncThunk<SignUpResponse, void, {state : StateSchema}>(
-    "signIn/userSignUp",
+    "signUp/userSignUp",
     async (_, thunkAPI) => {
         try {
             const signInData = getSignUpFields(thunkAPI.getState());
             
             const response = await $api.post<SignUpResponse>("signup", signInData);
-    
+            console.log(response);
             thunkAPI.dispatch(userActions.setUserData(response.data));
-    
+
             return response.data;
         }
         catch(error) {
