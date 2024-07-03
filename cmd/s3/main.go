@@ -1,8 +1,6 @@
 package main
 
-import (
-	"pawpawchat/pkg/auth/service"
-)
+import "pawpawchat/pkg/s3/service"
 
 func main() {
 	service.Start()

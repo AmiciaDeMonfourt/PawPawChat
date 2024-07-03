@@ -3,6 +3,7 @@ package routes
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"pawpawchat/generated/proto/auth"
 	"pawpawchat/generated/proto/users"
@@ -13,20 +14,20 @@ import (
 )
 
 type userRoutes struct {
-	client *grpcclient.Client
+	gRPCClient *grpcclient.Client
 }
 
-func NewUserRoutes(client *grpcclient.Client) *userRoutes {
+func NewUserRoutes(gRPCClient *grpcclient.Client) *userRoutes {
 	return &userRoutes{
-		client: client,
+		gRPCClient: gRPCClient,
 	}
 }
 
 // @Summary      Sign up
 // @Description  Registration
 // @Param        requestBody    body      auth.SignInRequest	true	"Credentials"
-// @Success      200  			{object}   auth.SignInResponse
-// @Failure      400  			{object}  response.HTTPError
+// @Success      201  			{object}   auth.SignInResponse
+// @Failure      409  			{object}  response.HTTPError
 // @Failure      500  			{object}  response.HTTPError
 // @Router       /signup [post]
 func (r *userRoutes) SignUp(w http.ResponseWriter, req *http.Request) {
@@ -36,13 +37,18 @@ func (r *userRoutes) SignUp(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	singnUpResp, err := r.client.Auth().SignUp(context.TODO(), signUpReq)
+	signUpResp, err := r.gRPCClient.Auth().SignUp(context.TODO(), signUpReq)
 	if err != nil {
 		response.InternalErr(w, err)
 		return
 	}
 
-	response.Created(w, singnUpResp)
+	if signUpResp.GetError() != "" {
+		response.Conflict(w, errors.New(signUpResp.GetError()))
+		return
+	}
+
+	response.Created(w, signUpResp)
 }
 
 // @Summary      Sign in
@@ -50,7 +56,7 @@ func (r *userRoutes) SignUp(w http.ResponseWriter, req *http.Request) {
 // @Param        Authorization  header    string              	true  "Token"
 // @Param        requestBody    body      auth.SignInRequest	true  "Credentials"
 // @Success      200  			{object}  auth.SignInResponse
-// @Failure      400  			{object}  response.HTTPError
+// @Failure      404  			{object}  response.HTTPError
 // @Failure      500  			{object}  response.HTTPError
 // @Router       /signin [post]
 func (r *userRoutes) SignIn(w http.ResponseWriter, req *http.Request) {
@@ -60,13 +66,18 @@ func (r *userRoutes) SignIn(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	signResp, err := r.client.Auth().SignIn(context.TODO(), signInReq)
+	signInResp, err := r.gRPCClient.Auth().SignIn(context.TODO(), signInReq)
 	if err != nil {
 		response.InternalErr(w, err)
 		return
 	}
 
-	response.OK(w, signResp)
+	if signInResp.GetError() != "" {
+		response.Forbidden(w, errors.New(signInResp.GetError()))
+		return
+	}
+
+	response.OK(w, signInResp)
 }
 
 // @Summary      Page
@@ -79,7 +90,7 @@ func (r *userRoutes) SignIn(w http.ResponseWriter, req *http.Request) {
 func (r *userRoutes) Page(w http.ResponseWriter, req *http.Request) {
 	username := mux.Vars(req)["username"]
 
-	user, err := r.client.Users().GetByUsername(context.TODO(), &users.GetByUsernameRequest{Username: username})
+	user, err := r.gRPCClient.Users().GetByUsername(context.TODO(), &users.GetByUsernameRequest{Username: username})
 	if err != nil {
 		response.BadReq(w, err)
 		return

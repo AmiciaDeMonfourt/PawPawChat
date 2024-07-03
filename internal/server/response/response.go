@@ -5,43 +5,50 @@ import (
 	"net/http"
 )
 
-func writeJSONResponse(w http.ResponseWriter, code int, data interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(data)
+type HTTPError struct {
+	Error string `json:"error"`
 }
 
-// SUCCESS
+func jsonResponse(w http.ResponseWriter, statusCode int, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	if data != nil {
+		json.NewEncoder(w).Encode(data)
+	}
+}
+
 func OK(w http.ResponseWriter, data interface{}) {
-	writeJSONResponse(w, http.StatusOK, data)
+	jsonResponse(w, http.StatusOK, data)
 }
 
 func Created(w http.ResponseWriter, data interface{}) {
-	writeJSONResponse(w, http.StatusCreated, data)
+	jsonResponse(w, http.StatusCreated, data)
 }
 
-// FAILED
+func HTTPErrorResp(w http.ResponseWriter, statusCode int, err error) {
+	jsonResponse(w, statusCode, &HTTPError{Error: err.Error()})
+}
+
 func BadReq(w http.ResponseWriter, err error) {
-	writeJSONResponse(w, http.StatusBadRequest, &HTTPError{Error: err.Error()})
+	HTTPErrorResp(w, http.StatusBadRequest, err)
+}
+
+func Conflict(w http.ResponseWriter, err error) {
+	HTTPErrorResp(w, http.StatusConflict, err)
+}
+
+func Forbidden(w http.ResponseWriter, err error) {
+	HTTPErrorResp(w, http.StatusForbidden, err)
 }
 
 func InternalErr(w http.ResponseWriter, err error) {
-	writeJSONResponse(w, http.StatusInternalServerError, &HTTPError{Error: err.Error()})
+	HTTPErrorResp(w, http.StatusInternalServerError, err)
 }
 
 func NotFound(w http.ResponseWriter, err error) {
-	writeJSONResponse(w, http.StatusNotFound, &HTTPError{Error: err.Error()})
+	HTTPErrorResp(w, http.StatusNotFound, err)
 }
 
 func Unauthorized(w http.ResponseWriter, err error) {
-	writeJSONResponse(w, http.StatusUnauthorized, &HTTPError{Error: err.Error()})
-}
-
-func NoContent(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusNoContent)
-}
-
-// MODELS FOR SWAGGER
-type HTTPError struct {
-	Error string `json:"error"`
+	HTTPErrorResp(w, http.StatusUnauthorized, err)
 }

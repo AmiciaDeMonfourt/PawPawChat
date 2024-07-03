@@ -16,7 +16,7 @@ type authService struct {
 	auth.UnsafeAuthServiceServer
 }
 
-func New() (*authService, error) {
+func new() (*authService, error) {
 	// Creating new grpc client with connection to other microservices
 	client, err := client.New()
 	if err != nil {
@@ -51,7 +51,7 @@ func (s *authService) SignUp(ctx context.Context, req *auth.SignUpRequest) (*aut
 	// Generate token for new user
 	tokenStr, err := jwt.GenerateToken(createResp.User.GetId())
 	if err != nil {
-		return nil, status.Error(codes.Aborted, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	// Return token string and users credentials

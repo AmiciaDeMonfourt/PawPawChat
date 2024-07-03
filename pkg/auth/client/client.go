@@ -1,7 +1,7 @@
 package client
 
 import (
-	"pawpawchat/config"
+	"os"
 	"pawpawchat/generated/proto/users"
 
 	"google.golang.org/grpc"
@@ -13,7 +13,7 @@ type Client struct {
 }
 
 func New() (*Client, error) {
-	conn, err := grpc.NewClient(config.App().UsersAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("USERS_ADDR"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

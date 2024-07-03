@@ -1,9 +1,9 @@
-package db
+package database
 
 import (
-	"context"
 	"database/sql"
-	"pawpawchat/pkg/users/config"
+	"log"
+	"os"
 	"pawpawchat/pkg/users/database/repository"
 
 	_ "github.com/lib/pq"
@@ -13,22 +13,27 @@ type DataBase struct {
 	user *repository.UserRepository
 }
 
-func New() (*DataBase, error) {
-	cfg := config.DataBase()
-
-	db, err := sql.Open(cfg.Driver, cfg.Source)
-	if err != nil {
-		return nil, err
+func New() *DataBase {
+	dbDRIVER := os.Getenv("USERS_DB_DRIVER")
+	if dbDRIVER == "" {
+		log.Fatal("missing db driver")
 	}
 
-	err = db.PingContext(context.TODO())
-	if err != nil {
-		return nil, err
+	dbURL := os.Getenv("USERS_DB_URL")
+	if dbURL == "" {
+		log.Fatal("misssing db url")
 	}
 
-	return &DataBase{
-		user: repository.NewUserRepository(db),
-	}, nil
+	db, err := sql.Open(dbDRIVER, dbURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err = db.Ping(); err != nil {
+		log.Fatal("could not connection to user data base: ", err)
+	}
+
+	return &DataBase{user: repository.NewUserRepository(db)}
 }
 
 func (d *DataBase) User() *repository.UserRepository {
