@@ -2,6 +2,16 @@ package web
 
 import "pawpawchat/internal/model/domain"
 
+type UserRequest struct {
+	TokenStr string `json:"token_string"`
+}
+
+type UserResponse struct {
+	User domain.User `json:"user"`
+}
+
+///
+
 type UserSignUpRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`

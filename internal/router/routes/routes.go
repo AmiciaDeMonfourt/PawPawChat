@@ -8,4 +8,6 @@ type User interface {
 	SignIn(http.ResponseWriter, *http.Request)
 
 	Page(http.ResponseWriter, *http.Request)
+
+	User(http.ResponseWriter, *http.Request)
 }

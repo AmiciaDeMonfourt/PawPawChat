@@ -24,6 +24,15 @@ definitions:
       username:
         type: string
     type: object
+  domain.User:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
   response.HTTPError:
     properties:
       error:
@@ -45,9 +54,13 @@ definitions:
       username:
         type: string
     type: object
+  web.UserResponse:
+    properties:
+      user:
+        $ref: '#/definitions/domain.User'
+    type: object
 info:
   contact: {}
-  title: Service API
 paths:
   /{username}:
     get:
@@ -72,6 +85,29 @@ paths:
           schema:
             $ref: '#/definitions/response.HTTPError'
       summary: Page
+  /api/user:
+    get:
+      description: User info
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.UserResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+      summary: User
   /signin:
     post:
       description: Authorization
@@ -92,8 +128,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/auth.SignInResponse'
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/response.HTTPError'
         "500":
@@ -112,12 +148,12 @@ paths:
         schema:
           $ref: '#/definitions/auth.SignInRequest'
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/auth.SignInResponse'
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           schema:
             $ref: '#/definitions/response.HTTPError'
         "500":

@@ -37,6 +37,9 @@ func (r *Router) Configure() {
 func (r *Router) configureUserRoutes() {
 	r.router.HandleFunc("/signup", r.user.SignUp).Methods("POST")
 	r.router.HandleFunc("/signin", r.user.SignIn).Methods("POST")
+
+	r.router.HandleFunc("/api/user", middleware.Auth(r.gRPCClient, r.user.User)).Methods("GET")
+
 	r.router.HandleFunc("/{username}", middleware.Auth(r.gRPCClient, r.user.Page)).Methods("GET")
 }
 

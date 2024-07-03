@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  s3:
+    build:
+      context: .
+      dockerfile: ./pkg/s3/dockerfile
+    environment:
+      S3_ADDR: ${S3_ADDR}
+    ports:
+      - ${S3_PORT}:${S3_PORT}

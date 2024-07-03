@@ -2,6 +2,7 @@ package response
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -10,10 +11,12 @@ type HTTPError struct {
 }
 
 func jsonResponse(w http.ResponseWriter, statusCode int, data interface{}) {
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	if data != nil {
-		json.NewEncoder(w).Encode(data)
+		err := json.NewEncoder(w).Encode(data)
+		if err != nil {
+			log.Printf("could not encode data: %v\nerror: %v", data, err)
+		}
 	}
 }
 
@@ -25,30 +28,30 @@ func Created(w http.ResponseWriter, data interface{}) {
 	jsonResponse(w, http.StatusCreated, data)
 }
 
-func HTTPErrorResp(w http.ResponseWriter, statusCode int, err error) {
-	jsonResponse(w, statusCode, &HTTPError{Error: err.Error()})
+func HTTPErrorResp(w http.ResponseWriter, statusCode int, errMsg string) {
+	jsonResponse(w, statusCode, &HTTPError{Error: errMsg})
 }
 
-func BadReq(w http.ResponseWriter, err error) {
-	HTTPErrorResp(w, http.StatusBadRequest, err)
+func BadReq(w http.ResponseWriter, errMsg string) {
+	HTTPErrorResp(w, http.StatusBadRequest, errMsg)
 }
 
-func Conflict(w http.ResponseWriter, err error) {
-	HTTPErrorResp(w, http.StatusConflict, err)
+func Conflict(w http.ResponseWriter, errMsg string) {
+	HTTPErrorResp(w, http.StatusConflict, errMsg)
 }
 
-func Forbidden(w http.ResponseWriter, err error) {
-	HTTPErrorResp(w, http.StatusForbidden, err)
+func Forbidden(w http.ResponseWriter, errMsg string) {
+	HTTPErrorResp(w, http.StatusForbidden, errMsg)
 }
 
-func InternalErr(w http.ResponseWriter, err error) {
-	HTTPErrorResp(w, http.StatusInternalServerError, err)
+func InternalErr(w http.ResponseWriter, errMsg string) {
+	HTTPErrorResp(w, http.StatusInternalServerError, errMsg)
 }
 
-func NotFound(w http.ResponseWriter, err error) {
-	HTTPErrorResp(w, http.StatusNotFound, err)
+func NotFound(w http.ResponseWriter, errMsg string) {
+	HTTPErrorResp(w, http.StatusNotFound, errMsg)
 }
 
-func Unauthorized(w http.ResponseWriter, err error) {
-	HTTPErrorResp(w, http.StatusUnauthorized, err)
+func Unauthorized(w http.ResponseWriter, errMsg string) {
+	HTTPErrorResp(w, http.StatusUnauthorized, errMsg)
 }
