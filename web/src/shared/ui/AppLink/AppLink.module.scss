@@ -1,7 +1,12 @@
 .AppLink {
-    
+    font: var(--font-m);
 }
 
 .classic {
+    color: var(--inverted-additional-color);
+}
+
+.clear {
+    text-decoration: none;
     color: var(--inverted-additional-color);
 }

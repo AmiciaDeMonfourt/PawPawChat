@@ -1,9 +1,10 @@
 export interface User {
-    ID: number;
-    Username: string;
-    Email: string;
+    id: number;
+    username: string;
+    email: string;
 }
 
 export interface UserShema {
     UserData?: User;
+    isInit: boolean;
 }

@@ -1,0 +1,30 @@
+.ProfilePanel {
+    width: 100%;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: 300px 100px;
+    grid-gap: 10px;
+}
+
+.avatar {
+    height: 70px;
+    width: 70px;
+    border-radius: 35px;
+    background-color: var(--main-color);
+    margin-right: 10px;
+}
+
+.person {
+    display: flex;
+    background-color: var(--additional-color);
+}
+
+.info {
+    background-color: var(--additional-color);
+}
+
+.friends {
+    background-color: var(--additional-color);
+    grid-column: span 2;
+}

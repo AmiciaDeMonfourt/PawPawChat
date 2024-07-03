@@ -6,10 +6,7 @@
     position: relative;
   }
   
-.SidebarContent {
-    flex-grow: 1;
-    padding: 20px;
-  }
+
   
 .resizer {
     width: 2px;
@@ -20,12 +17,3 @@
     right: 0;
     bottom: 0;
   }
-
-.switchers {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  align-items: center;
-  position: absolute;
-  bottom: 10px;
-}

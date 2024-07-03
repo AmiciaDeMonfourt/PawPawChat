@@ -1,9 +1,11 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { UserShema } from "../types/userSchema";
 import { SignInResponse } from "features/SignIn/model/types/SignInResponse";
+import { LOCAL_STORAGE_TOKEN_KEY } from "shared/consts/localstorage";
 
 const initialState: UserShema = {
-    UserData: undefined,
+    UserData: null,
+    isInit: false
 };
 
 export const userSlice = createSlice({
@@ -11,15 +13,8 @@ export const userSlice = createSlice({
     initialState,
     reducers: {
         setUserData: (state , action : PayloadAction<SignInResponse>) => {
-            console.log(action);
-            console.log("fff");
-            const {Username, ID, Email} = action.payload.user;
-
-            state.UserData.Email = "f";
-            state.UserData.Username = "f";
-            state.UserData.ID = 1;
-
-            localStorage.setItem("token", action.payload.tokenString);
+            state.UserData = action.payload.user;
+            localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, action.payload.tokenString);
         }
     },
 });

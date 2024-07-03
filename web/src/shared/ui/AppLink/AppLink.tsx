@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 
 export enum AppLinkTheme {
     CLASSIC = "classic",
+    CLEAR = "clear",
 }
 
 interface AppLinkProps extends LinkProps {

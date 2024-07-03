@@ -13,9 +13,7 @@ export const SignIn = createAsyncThunk<SignInResponse, void, {state : StateSchem
             const signInData = getSignInFields(thunkAPI.getState());
     
             const response = await $api.post<SignInResponse>("signin", signInData);
-    
             thunkAPI.dispatch(userActions.setUserData(response.data));
-    
             return response.data;
         }
         catch(error) {

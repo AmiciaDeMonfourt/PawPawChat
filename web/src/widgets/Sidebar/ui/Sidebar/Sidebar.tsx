@@ -1,8 +1,11 @@
 import { classNames } from "shared/lib/classNames/classNames";
 import cls from "./Sidebar.module.scss";
-import { useRef, useState } from "react";
 import { defaultSidebarWith, maxSidebarWith, minSidebarWith } from "widgets/Sidebar/config/config";
-import { ThemeSwitcher } from "widgets/ThemeSwitcher";
+import { useResize } from "shared/lib/resize/UseResize";
+import { SidebarContent } from "../SidebarContent/SidebarContent";
+import { Text } from "shared/ui/Text/Text";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser } from "entities/User/selectors/getUser";
 
 interface SidebarProps {
     className?: string
@@ -10,42 +13,23 @@ interface SidebarProps {
 
 export const Sidebar = ({className} : SidebarProps) => {
 
-    const [sidebarWidth, setSidebarWidth] = useState(defaultSidebarWith);
-
-    const sidebarRef = useRef(null);
-
-    const onMouseDown = () => {
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-        document.body.classList.add("no-select");
-    }
-    const onMouseMove = (e : any) => {
-        const newWidth = e.clientX - sidebarRef.current.getBoundingClientRect().left;
-        const newCorrectWidth = Math.min(Math.max(minSidebarWith, newWidth), maxSidebarWith);
-
-        setSidebarWidth(newCorrectWidth);
-    }
-    const onMouseUp = () => {
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        document.body.classList.remove("no-select");
-    }
+    const {ref, width, onMouseDown} = useResize({
+        defaultWidth: defaultSidebarWith,
+        minWidth: minSidebarWith,
+        maxWidth: maxSidebarWith,
+    });
 
     return (
         <div 
             className={classNames(cls.Sidebar, {}, [className])}
-            ref={sidebarRef}
-            style={{width: `${sidebarWidth}px`}}
+            ref={ref}
+            style={{width: `${width}px`}}
         >
-            <div className={cls.SidebarContent}>
-
-            </div>
+            <SidebarContent/>
             <div
                 className={cls.resizer}
                 onMouseDown={onMouseDown}
             />
-            <div className={cls.switchers}>
-            </div>
         </div>
     )
 }

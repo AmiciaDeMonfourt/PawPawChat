@@ -15,6 +15,7 @@ interface ContentWrapperProps {
     children?: React.ReactNode;
     fullscreen?: boolean;
     align?: PageAlign;
+    className?: string;
 }
 
 export const ContentWrapper: FC<ContentWrapperProps> = (props) => {
@@ -22,11 +23,12 @@ export const ContentWrapper: FC<ContentWrapperProps> = (props) => {
     const {
         children,
         fullscreen = false,
+        className,
         align = PageAlign.DEFAULT
     } = props
 
     return (
-        <div className="content-wrapper">
+        <div className={classNames("content-wrapper", {}, [className])}>
             {!fullscreen ? <Sidebar/> : null}
             <div className={classNames("page-wrapper", {}, [cls[align]])}>
                 {children}

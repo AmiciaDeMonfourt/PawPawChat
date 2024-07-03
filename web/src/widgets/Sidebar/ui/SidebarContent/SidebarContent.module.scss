@@ -1,0 +1,30 @@
+.SidebarContent {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+
+.item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .icon {
+    margin-right: 5px;
+    fill: var(--text-color);
+  }
+  
+  .Options {
+    list-style: none; 
+  }
+
+.user {
+    margin-bottom: 20px;
+}
+
+.option {
+    margin-bottom: 10px;
+}
