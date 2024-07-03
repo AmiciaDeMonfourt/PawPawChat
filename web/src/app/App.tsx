@@ -1,20 +1,28 @@
 import { classNames } from "shared/lib/classNames/classNames";
 import "app/styles/index.scss";
 import { AppRouter } from "./providers/router/ui/AppRouter";
-import { ThemeSwitcher } from "widgets/ThemeSwitcher";
 import { useTheme } from "./providers/ThemeProvider";
 import { Navbar } from "widgets/Navbar";
-import { Sidebar } from "widgets/Sidebar/ui/Sidebar/Sidebar";
-import { ContentWrapper } from "shared/ui/ContentWrapper/ContentWrapper";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "./providers/StoreProvider/config/store";
+import { initUser } from "entities/User/model/service/initUser";
+import { getIsInit } from "entities/User/model/selectors/getIsInit";
 
 export const App = () => {
 
     const {theme} = useTheme();
+    const dispatch = useDispatch<AppDispatch>();
+    const isInit = useSelector(getIsInit);
+
+    useEffect(() => {
+        dispatch(initUser());
+    }, [dispatch]);
 
     return (
         <div className={classNames("app", {}, [theme])}>
             <Navbar/>
-            <AppRouter/>
+            {!isInit || <AppRouter/>}
         </div>
     )
 }

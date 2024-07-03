@@ -5,7 +5,7 @@ const MainPage = () => {
     return (
         <ContentWrapper>
             <Text>
-                MainPage safasdf as fsa fsa
+                Главная станица
             </Text>
         </ContentWrapper>
     )

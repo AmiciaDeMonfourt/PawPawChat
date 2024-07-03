@@ -7,4 +7,5 @@ export interface User {
 export interface UserShema {
     UserData?: User;
     isInit: boolean;
+    isAuth: boolean;
 }

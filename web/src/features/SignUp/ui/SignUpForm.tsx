@@ -10,6 +10,8 @@ import { Input } from "shared/ui/Input/Input";
 import { getSignUp } from "../model/selectors/getSignUp/getSignUp";
 import { useCallback } from "react";
 import { signUpActions } from "../model/slice/signUpSlice";
+import { getIsAuth } from "entities/User/model/selectors/getIsAuth";
+import { Navigate } from "react-router-dom";
 
 interface SignUpFormProps {
     className?: string
@@ -19,6 +21,7 @@ export const SignUpForm = ({className} : SignUpFormProps) => {
 
     const dispatch = useDispatch<AppDispatch>();
     const data =useSelector(getSignUp);
+    const isAuth = useSelector(getIsAuth);
 
     const {
         Username,
@@ -43,6 +46,8 @@ export const SignUpForm = ({className} : SignUpFormProps) => {
         e.preventDefault();
         dispatch(SignUp());
     }, [dispatch]);
+
+    if(isAuth) return <Navigate to={RoutesPaths[AppRoutes.HOME]} />
 
     return (
         <div className={classNames(cls.SignUpForm, {}, [className])}>

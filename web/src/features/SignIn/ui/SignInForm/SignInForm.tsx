@@ -10,6 +10,8 @@ import { AppLink } from "shared/ui/AppLink/AppLink";
 import { Input } from "shared/ui/Input/Input";
 import { useCallback } from "react";
 import { signInActions } from "features/SignIn/model/slice/signInSlice";
+import { getIsAuth } from "entities/User/model/selectors/getIsAuth";
+import { Navigate } from "react-router-dom";
 
 interface SignInFormProps {
     className?: string
@@ -19,6 +21,7 @@ export const SignInForm = ({className} : SignInFormProps) => {
 
     const dispatch = useDispatch<AppDispatch>();
     const data = useSelector(getSignIn);
+    const isAuth = useSelector(getIsAuth);
 
     const {
         Email,
@@ -38,6 +41,8 @@ export const SignInForm = ({className} : SignInFormProps) => {
         e.preventDefault();
         dispatch(SignIn());
     }, [dispatch]);
+
+    if(isAuth) return <Navigate to={RoutesPaths[AppRoutes.HOME]} />
 
     return (
         <div className={classNames(cls.SignInForm, {}, [className])}>

@@ -9,12 +9,18 @@ import Feed from "shared/assets/icons/view_agenda.svg";
 
 import { IconLabel } from "shared/ui/IconLabel/IconLabel";
 import { Text } from "shared/ui/Text/Text";
-import { useSelector } from "react-redux";
-import { getUser } from "entities/User/selectors/getUser";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser } from "entities/User/model/selectors/getUser";
+import { Button, ButtonTheme } from "shared/ui/Button/Button";
+import { AppDispatch } from "app/providers/StoreProvider/config/store";
+import { userActions } from "entities/User";
 
 export const SidebarContent = () => {
 
     const user = useSelector(getUser);
+    const dispatch = useDispatch<AppDispatch>();
+
+    const onLogout = () => dispatch(userActions.logout());
 
     return (
         <div className={cls.SidebarContent}>
@@ -44,9 +50,12 @@ export const SidebarContent = () => {
                     </ul>
                 </div>
                 <div className={cls.BottomPanel}>
-                    <AppLink theme={AppLinkTheme.CLEAR} to={"/profile"}>
+                    <Button
+                        theme={ButtonTheme.CLEAR}
+                        onClick={onLogout}
+                    >
                         <IconLabel icon={Exit} text={"Выйти"}/>
-                    </AppLink>
+                    </Button>
                 </div>
             </div>
     )

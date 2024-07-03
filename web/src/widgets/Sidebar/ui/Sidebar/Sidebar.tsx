@@ -5,7 +5,7 @@ import { useResize } from "shared/lib/resize/UseResize";
 import { SidebarContent } from "../SidebarContent/SidebarContent";
 import { Text } from "shared/ui/Text/Text";
 import { useDispatch, useSelector } from "react-redux";
-import { getUser } from "entities/User/selectors/getUser";
+import { getUser } from "entities/User/model/selectors/getUser";
 
 interface SidebarProps {
     className?: string
