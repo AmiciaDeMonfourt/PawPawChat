@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	AuthService_SignUp_FullMethodName     = "/auth.AuthService/SignUp"
-	AuthService_SignIn_FullMethodName     = "/auth.AuthService/SignIn"
-	AuthService_CheckToken_FullMethodName = "/auth.AuthService/CheckToken"
+	AuthService_SignUp_FullMethodName    = "/auth.AuthService/SignUp"
+	AuthService_SignIn_FullMethodName    = "/auth.AuthService/SignIn"
+	AuthService_CheckAuth_FullMethodName = "/auth.AuthService/CheckAuth"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -30,7 +30,7 @@ const (
 type AuthServiceClient interface {
 	SignUp(ctx context.Context, in *SignUpRequest, opts ...grpc.CallOption) (*SignUpResponse, error)
 	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInResponse, error)
-	CheckToken(ctx context.Context, in *CheckTokenRequest, opts ...grpc.CallOption) (*CheckTokenResponse, error)
+	CheckAuth(ctx context.Context, in *CheckAuthRequest, opts ...grpc.CallOption) (*CheckAuthResponse, error)
 }
 
 type authServiceClient struct {
@@ -61,10 +61,10 @@ func (c *authServiceClient) SignIn(ctx context.Context, in *SignInRequest, opts 
 	return out, nil
 }
 
-func (c *authServiceClient) CheckToken(ctx context.Context, in *CheckTokenRequest, opts ...grpc.CallOption) (*CheckTokenResponse, error) {
+func (c *authServiceClient) CheckAuth(ctx context.Context, in *CheckAuthRequest, opts ...grpc.CallOption) (*CheckAuthResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CheckTokenResponse)
-	err := c.cc.Invoke(ctx, AuthService_CheckToken_FullMethodName, in, out, cOpts...)
+	out := new(CheckAuthResponse)
+	err := c.cc.Invoke(ctx, AuthService_CheckAuth_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (c *authServiceClient) CheckToken(ctx context.Context, in *CheckTokenReques
 type AuthServiceServer interface {
 	SignUp(context.Context, *SignUpRequest) (*SignUpResponse, error)
 	SignIn(context.Context, *SignInRequest) (*SignInResponse, error)
-	CheckToken(context.Context, *CheckTokenRequest) (*CheckTokenResponse, error)
+	CheckAuth(context.Context, *CheckAuthRequest) (*CheckAuthResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -91,8 +91,8 @@ func (UnimplementedAuthServiceServer) SignUp(context.Context, *SignUpRequest) (*
 func (UnimplementedAuthServiceServer) SignIn(context.Context, *SignInRequest) (*SignInResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
 }
-func (UnimplementedAuthServiceServer) CheckToken(context.Context, *CheckTokenRequest) (*CheckTokenResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckToken not implemented")
+func (UnimplementedAuthServiceServer) CheckAuth(context.Context, *CheckAuthRequest) (*CheckAuthResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckAuth not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -143,20 +143,20 @@ func _AuthService_SignIn_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_CheckToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckTokenRequest)
+func _AuthService_CheckAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckAuthRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).CheckToken(ctx, in)
+		return srv.(AuthServiceServer).CheckAuth(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthService_CheckToken_FullMethodName,
+		FullMethod: AuthService_CheckAuth_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).CheckToken(ctx, req.(*CheckTokenRequest))
+		return srv.(AuthServiceServer).CheckAuth(ctx, req.(*CheckAuthRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -177,8 +177,8 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AuthService_SignIn_Handler,
 		},
 		{
-			MethodName: "CheckToken",
-			Handler:    _AuthService_CheckToken_Handler,
+			MethodName: "CheckAuth",
+			Handler:    _AuthService_CheckAuth_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

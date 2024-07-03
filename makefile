@@ -17,20 +17,16 @@ endif
 	$(call GENERATE_PROTO,${s})
 
 
-SERVICES = users auth app 
-
 # Run application
 run:
 ifndef s
-	@$(error parameter [s] "service name" is requiered)
-endif
-ifeq ($(s), all)
-# $(foreach service, $(SERVICES), go run cmd/${service}/main.go &)
 	@./run.sh
-else
-	@go run cmd/${s}/main.go
 endif
+	@go run cmd/${s}/main.go
 
+
+swag:
+	@swag init -g cmd\app\main.go
 
 
 # Create new migration
@@ -42,6 +38,7 @@ ifndef n
 	$(error parameter [n] "migrartion name" is required)
 endif
 	@migrate create -ext=sql -dir=$(d) -seq $(n)
+
 
 # Run migrations
 migrate: 
@@ -55,3 +52,23 @@ ifndef db
 	@$(error parameter [db] "database" is requiered)
 endif
 	migrate -path=${d} -database postgres://cashr:admin@localhost:5432/${db}?sslmode=disable -verbose ${v}
+
+
+help:
+	@echo "Targets"
+	@echo
+	@echo "  run             s=[service][not requiered]"
+	@echo "                    Run service. If 's' is undefined - it runs all of the services"
+	@echo
+	@echo "  pb              s=[service]"
+	@echo "                    Compile .proto file for the specified services ."
+	@echo
+	@echo "  swag            -"
+	@echo "                    Generate a swagger documentation"
+	@echo
+	@echo "  new_migrate     d=[dir] n=[name]"
+	@echo "                    Creates a new migrate in the specifed directory."
+	@echo
+	@echo "  migrate         d=[dir] v=[verbose] db=[dbname]"
+	@echo "                    Applies migrations to the database."
+

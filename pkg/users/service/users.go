@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"log"
 	"pawpawchat/generated/proto/users"
 	db "pawpawchat/pkg/users/database"
 	"pawpawchat/pkg/users/model"
@@ -21,14 +20,12 @@ func New(db *db.DataBase) *UsersService {
 }
 
 func (s *UsersService) Create(ctx context.Context, req *users.CreateRequest) (*users.CreateResponse, error) {
-	// Create user model
 	user, err := model.NewUser(req)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "incorrect user data: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid user data: %v", err)
 	}
 
-	// Check email on once using
-	existingUser, err := s.db.User().FindByEmail(req.GetEmail())
+	existingUser, err := s.db.User().GetByEmail(user.Email)
 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "database error: %v", err)
@@ -36,20 +33,16 @@ func (s *UsersService) Create(ctx context.Context, req *users.CreateRequest) (*u
 
 	if existingUser != nil {
 		return &users.CreateResponse{
-			Status: "error",
-			Error:  "user with this email already exists",
+			Error: "user with this email already exists",
 		}, nil
 	}
 
-	// Add new item in database
 	err = s.db.User().Create(user)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
 	}
 
-	// Return
 	return &users.CreateResponse{
-		Status: "success",
 		User: &users.User{
 			Id:       user.ID,
 			Username: user.Username,
@@ -58,28 +51,85 @@ func (s *UsersService) Create(ctx context.Context, req *users.CreateRequest) (*u
 	}, nil
 }
 
-func (s *UsersService) FindByEmail(ctx context.Context, req *users.FindByEmailRequest) (*users.FindByEmailResponse, error) {
-	user, err := s.db.User().FindByEmail(req.GetEmail())
+func (s *UsersService) CheckCredentials(ctx context.Context, req *users.CheckCredentialsRequest) (*users.CheckCredentialsResponse, error) {
+	if req.GetPassword() == "" {
+		return nil, status.Error(codes.InvalidArgument, "missing password")
+	}
+
+	hashPass, err := s.getUserHashPass(req.GetEmail())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	log.Printf("FindByEmail: %v", user)
-
-	if user == nil {
-		log.Println("user is nil")
-		return &users.FindByEmailResponse{
-			Status: "not find",
-		}, nil
+	if hashPass == "" {
+		return &users.CheckCredentialsResponse{Error: "not found user with this email"}, nil
 	}
 
-	return &users.FindByEmailResponse{
-		Status: "success",
+	user := model.User{Email: req.Email, HashPass: hashPass}
+	if err := user.ValidatePassword(req.Password); err != nil {
+		return &users.CheckCredentialsResponse{Error: "invalid password"}, nil
+	}
+
+	return &users.CheckCredentialsResponse{}, nil
+}
+
+func (s *UsersService) GetByEmail(ctx context.Context, req *users.GetByEmailRequest) (*users.GetByEmailResponse, error) {
+	user, err := s.db.User().GetByEmail(req.GetEmail())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if user == nil {
+		return &users.GetByEmailResponse{Error: "not found user with this email"}, nil
+	}
+
+	return &users.GetByEmailResponse{
 		User: &users.User{
 			Id:       user.ID,
 			Username: user.Username,
 			Email:    user.Email,
-			HashPass: user.HashPass,
 		},
 	}, nil
+}
+
+func (s *UsersService) GetById(ctx context.Context, req *users.GetByIdRequest) (*users.GetByIdResponse, error) {
+	user, err := s.db.User().GetById(req.GetId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if user == nil {
+		return &users.GetByIdResponse{Error: "not found user with this id"}, nil
+	}
+
+	return &users.GetByIdResponse{
+		User: &users.User{
+			Id:       user.ID,
+			Username: user.Username,
+			Email:    user.Email,
+		},
+	}, nil
+}
+
+func (s *UsersService) GetByUsername(ctx context.Context, req *users.GetByUsernameRequest) (*users.GetByUsernameResponse, error) {
+	user, err := s.db.User().GetByUsername(req.GetUsername())
+	if err != nil {
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	if user == nil {
+		return &users.GetByUsernameResponse{Error: "not found user with this username"}, nil
+	}
+
+	return &users.GetByUsernameResponse{
+		User: &users.User{
+			Id:       user.ID,
+			Username: user.Username,
+			Email:    user.Email,
+		},
+	}, nil
+}
+
+func (s *UsersService) getUserHashPass(email string) (string, error) {
+	return s.db.User().GetHashPass(email)
 }

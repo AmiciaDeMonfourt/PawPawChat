@@ -9,46 +9,42 @@ service AuthService {
 
     rpc SignIn(SignInRequest) returns (SignInResponse);
 
-    rpc CheckToken(CheckTokenRequest) returns (CheckTokenResponse);
+    rpc CheckAuth(CheckAuthRequest) returns (CheckAuthResponse);
 }
 
-/// Domain model ///
 message User {
-    uint64 id = 1;
+    uint64 id       = 1;
     string username = 2;
-    string email = 3;
+    string email    = 3;
 }
 
-/// Sign in ///
 message SignInRequest {
-    string email = 1;
+    string email    = 1;
     string password = 2;
 } 
 message SignInResponse {
-    string tokenStr = 1;
-    string error = 2;
-    User user = 3;
+    User   user     = 1;
+    string tokenStr = 2;
+    string error    = 3;
 }
 
 
-/// Sign Up ///
 message SignUpRequest {
     string username = 1;
-    string email = 2;
+    string email    = 2;
     string password = 3;
 } 
 message SignUpResponse {
-    string tokenStr = 1;
-    string error = 2;
-    User user = 3;
+    User   user     = 1;
+    string error    = 3; 
+    string tokenStr = 2;
 }
 
 
-/// Check Token ///
-message CheckTokenRequest {
+message CheckAuthRequest {
     string tokenStr = 1; 
 }
-message CheckTokenResponse {
-    string status = 1;
-    string error = 2;
-}
+message CheckAuthResponse {
+    uint64 userid = 1;
+    string error  = 2;
+}  

@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"log"
 	"pawpawchat/generated/proto/auth"
 	"pawpawchat/generated/proto/users"
 	"pawpawchat/pkg/auth/client"
@@ -33,8 +32,10 @@ func (s *authService) SignUp(ctx context.Context, req *auth.SignUpRequest) (*aut
 	// Parse request, passing data to 'users' microservice to create a new user
 	createResp, err := s.client.Users().Create(ctx, &users.CreateRequest{
 		Email:    req.GetEmail(),
+		Username: req.GetUsername(),
 		Password: req.GetPassword(),
 	})
+
 	// Check internal errors
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -53,8 +54,6 @@ func (s *authService) SignUp(ctx context.Context, req *auth.SignUpRequest) (*aut
 		return nil, status.Error(codes.Aborted, err.Error())
 	}
 
-	log.Printf("authService: createResp: %v", createResp)
-
 	// Return token string and users credentials
 	return &auth.SignUpResponse{
 		TokenStr: tokenStr,
@@ -66,24 +65,32 @@ func (s *authService) SignUp(ctx context.Context, req *auth.SignUpRequest) (*aut
 	}, nil
 }
 
-func (s authService) SignIn(ctx context.Context, req *auth.SignInRequest) (*auth.SignInResponse, error) {
+func (s *authService) SignIn(ctx context.Context, req *auth.SignInRequest) (*auth.SignInResponse, error) {
 	// Parse request and finding the user with the same credentials
-	resp, err := s.client.Users().FindByEmail(ctx, &users.FindByEmailRequest{Email: req.GetEmail()})
+	resp, err := s.client.Users().GetByEmail(ctx, &users.GetByEmailRequest{Email: req.GetEmail()})
 	if err != nil {
 		return &auth.SignInResponse{Error: err.Error()}, nil
 	}
 
 	// Check is user exists
 	if resp.GetUser() == nil {
-		return &auth.SignInResponse{
-			Error: "not find user with this email",
-		}, nil
+		return &auth.SignInResponse{Error: "not find user with this email"}, nil
+	}
+
+	// Check user credentials
+	checkCredentialResp, err := s.client.Users().CheckCredentials(context.TODO(), &users.CheckCredentialsRequest{Email: req.GetEmail(), Password: req.GetPassword()})
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if err := checkCredentialResp.GetError(); err != "" {
+		return &auth.SignInResponse{Error: err}, nil
 	}
 
 	// Generate token
-	tokenStr, err := jwt.GenerateToken(resp.GetUser().Id)
+	tokenStr, err := jwt.GenerateToken(resp.User.GetId())
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to generate jwt token: %s", err.Error())
+		return nil, nil
 	}
 
 	// Return token and user
@@ -97,13 +104,17 @@ func (s authService) SignIn(ctx context.Context, req *auth.SignInRequest) (*auth
 	}, nil
 }
 
-func (s *authService) CheckToken(ctx context.Context, req *auth.CheckTokenRequest) (*auth.CheckTokenResponse, error) {
-	// Get token from request and checking it on correctness
-	if err := jwt.CheckToken(req.GetTokenStr()); err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "invalid toker: %s", err.Error())
+func (s *authService) CheckAuth(ctx context.Context, req *auth.CheckAuthRequest) (*auth.CheckAuthResponse, error) {
+	if req == nil || req.GetTokenStr() == "" {
+		return nil, status.Error(codes.InvalidArgument, "missing or empty token")
 	}
 
-	return &auth.CheckTokenResponse{
-		Status: "success",
+	id, err := jwt.ExtractUserId(req.GetTokenStr())
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth.CheckAuthResponse{
+		Userid: id,
 	}, nil
 }

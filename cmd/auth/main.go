@@ -8,6 +8,7 @@ import (
 	"pawpawchat/pkg/auth/service"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -19,6 +20,8 @@ func main() {
 
 	// grpc server
 	srv := grpc.NewServer()
+
+	reflection.Register(srv)
 
 	// register service
 	auth.RegisterAuthServiceServer(srv, authService)
