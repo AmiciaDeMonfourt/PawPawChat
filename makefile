@@ -1,74 +1,144 @@
-PROTOC = protoc
-PROTOC_OPTS = --go_out=paths=source_relative:generated/proto/$(1) --go-grpc_out=paths=source_relative:generated/proto/$(1)
+include .env
+.PHONY: pb go new_migrate migrate
+.DEAULT_GOAL := run
+############################################################################
+#CMD							   
+
+GO         := go
+RUN        := run
+SOURCE     := cmd/${s}/main.go
+RUN_SCRIPT := ./run.sh
+
+run:
+ifndef s	
+	@$(RUN_SCRIPT)
+endif
+	@$(GO) $(RUN) $(SOURCE)
+
+############################################################################
+
+############################################################################
+#PROTOCOL BUFFER							   
+
+PROTOC      := protoc
+GO_OUT      := --go_out
+GO_GRPC_OUT := --go-grpc_out
+SOURCE_PATH := api/proto
+TARGET_PATH := source_relative:generated/proto
+PROTOC_OPTS := $(GO_OUT)=$(TARGET_PATH)/$(1) $(GO_GRPC_OUT)=$(TARGET_PATH)/$(1)
 
 define GENERATE_PROTO
-	@$(PROTOC) -I api/proto/$(1) $(call PROTOC_OPTS,$(1)) api/proto/$(1)/$(1).proto
+	@$(PROTOC) -I $(SOURCE_PATH)/$(1) $(call PROTOC_OPTS, $(1)) $(SOURCE_PATH)/$(1)/$(1).proto
 endef
 
-SERVICES = app auth users
-
-.PHONY: pb go new_migrate migrate
-
-# Compile .proto files
 pb: 
 ifndef s
 	@$(error parameter [s] "service name" is required)
 endif
-	$(call GENERATE_PROTO,${s})
+	@$(call GENERATE_PROTO,${s})
 
+############################################################################
+																		   
+############################################################################
+#SWAGGER							   
 
-# Run application
-run:
-ifndef s
-	@./run.sh
-endif
-	@go run cmd/${s}/main.go
-
-
+SWAG    := swag
+FLAG    := -g
+SOURCE  := cmd\app\main.go
+COMMAND := init
 swag:
-	@swag init -g cmd\app\main.go
+	@$(SWAG) $(COMMAND) $(FLAG) $(SOURCE) 
+										
+																		   
+############################################################################
+
+############################################################################
+#POSTGRES
+
+define UPPER
+$(shell echo $(1) | tr '[:lower:]' '[:upper:]')
+endef
+
+# 1-user, 2-password, 3-dbname
+define IS_DB_EXISTS
+$(shell PGPASSWORD=$(2) $(PSQL) -U $(1) -lqt | cut -d \| -f 1 | grep -qw $(3) && echo true || echo false)
+endef
+
+# 1-user, 2-password, 3-dbname
+define CREATE_DATABASE
+@PGPASSWORD=$(2) $(CREATEDB) -U $(1) $(3)
+endef
+
+SERVICES  := users posts
+CREATEDB  := createdb
+PSQL 	  := psql
+
+create_db:
+ifeq ($(call IS_DB_EXISTS,${USERS_DB_USER},${USERS_DB_PASS},${USERS_DB_NAME}),true)
+	@echo "Database $(USERS_DB_NAME) already exists."
+else
+	@$(call CREATE_DATABASE,${USERS_DB_USER},${USERS_DB_PASS},${USERS_DB_NAME})
+	@echo "Database $(USERS_DB_NAME) created."
+endif
 
 
-# Create new migration
-new_migrate:
+############################################################################
+
+############################################################################
+#MIGRATE							   
+
+define FIND_SQL_PATH
+$(shell find $(1) -type f -name '*.sql' -exec dirname {} + | sort -u)
+endef
+
+define HAS_SQL_FILES 
+$(if $(call FIND_SQL_PATH,$(1)),$(1))
+endef
+
+
+MIGR         := migrate
+CREATE       := create -ext=sql
+EXT          := sql
+VERBOSE 	 := down up
+
+
+migratenew:
 ifndef d
-	$(error parameter [d] "target dir for migration files" is required)
+	$(error parameter dir is missing d=[..])
 endif
 ifndef n
-	$(error parameter [n] "migrartion name" is required)
+	$(error parameter sequence is missing s=[..])
 endif
-	@migrate create -ext=sql -dir=$(d) -seq $(n)
+	@$(MIGR) $(CREATE) -ext=$(EXT) -dir=$(d) -seq $(s) 
 
 
-# Run migrations
-migrate: 
-ifndef d
-	@$(error parameter [d] "target dir with migration files" is required)
-endif
-ifndef v
-	@$(error parameter [v] "verbose [up/down]" is required)
-endif
-ifndef db
-	@$(error parameter [db] "database" is requiered)
-endif
-	migrate -path=${d} -database postgres://cashr:admin@localhost:5432/${db}?sslmode=disable -verbose ${v}
+
+SERVICE_ROOT_DIRS := \
+	$(wildcard ./pkg/*)
+
+PATH_TO_SERVICE_WITH_MIGR := \
+	$(foreach root,$(SERVICE_ROOT_DIRS),$(call HAS_SQL_FILES,$(root)))
+
+SERVICE_WITH_MIGR := \
+	$(foreach path, ${PATH_TO_SERVICE_WITH_MIGR}, $(notdir ${path}))
+
+SERVICE_MIGR_DIRS := \
+	$(foreach root,$(SERVICE_ROOT_DIRS),$(call FIND_SQL_PATH,$(root)))
+
+SERVICE_DB_URLS := \
+	$(foreach service, ${SERVICE_WITH_MIGR},$(call UPPER,${service})_DB_URL)
+
+SERVICES_WITH_MIGR_COUNT := $(words $(SERVICE_MIGR_DIRS))
 
 
-help:
-	@echo "Targets"
-	@echo
-	@echo "  run             s=[service][not requiered]"
-	@echo "                    Run service. If 's' is undefined - it runs all of the services"
-	@echo
-	@echo "  pb              s=[service]"
-	@echo "                    Compile .proto file for the specified services ."
-	@echo
-	@echo "  swag            -"
-	@echo "                    Generate a swagger documentation"
-	@echo
-	@echo "  new_migrate     d=[dir] n=[name]"
-	@echo "                    Creates a new migrate in the specifed directory."
-	@echo
-	@echo "  migrate         d=[dir] v=[verbose] db=[dbname]"
-	@echo "                    Applies migrations to the database."
+define MIGRATE_RUN
+	${MIGR} \
+	-path=$(word $(1),$(SERVICE_MIGR_DIRS)) \
+	-database ${$(word $(1),$(SERVICE_DB_URLS))} \
+	-verbose $(2)
+endef
 
+migrate:
+	@$(foreach n, $(shell seq $(SERVICES_WITH_MIGR_COUNT)), \
+		$(foreach v, $(VERBOSE), \
+			$(call MIGRATE_RUN, $(n), $(v));))

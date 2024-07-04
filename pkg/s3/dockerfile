@@ -1,43 +1,17 @@
-# Используем официальный образ Golang в качестве базового образа
 FROM golang:1.22-alpine AS build
-
-# Устанавливаем переменные окружения
 ENV GO111MODULE=on \
     CGO_ENABLED=0 \
     GOOS=linux \
     GOARCH=amd64
-
-# Рабочая директория внутри контейнера
 WORKDIR /app
-
-# Копируем зависимости
 COPY go.mod go.sum ./
-
-# Устанавливаем зависимости
 RUN go mod download
-
-# Копируем все остальные файлы проекта
 COPY . .
-
-# Собираем приложение
 RUN go build -o main ./cmd/s3
 
-# Создаем production образ
 FROM alpine:latest
-
 WORKDIR /root/
-
-# Копируем исполняемый файл из предыдущего образа
 COPY --from=build /app/main .
-
-# Копируем .env файл
 COPY .env ./.env
-
-# Устанавливаем необходимые пакеты (если требуется)
-# RUN apk add --no-cache ...
-
-# Экспонируем порт, который будет использоваться вашим приложением
 EXPOSE 50053
-
-# Команда для запуска приложения
 CMD ["./main"]

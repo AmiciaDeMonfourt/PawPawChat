@@ -32,7 +32,6 @@ func (s *authService) SignUp(ctx context.Context, req *auth.SignUpRequest) (*aut
 	// Parse request, passing data to 'users' microservice to create a new user
 	createResp, err := s.client.Users().Create(ctx, &users.CreateRequest{
 		Email:    req.GetEmail(),
-		Username: req.GetUsername(),
 		Password: req.GetPassword(),
 	})
 
@@ -58,9 +57,8 @@ func (s *authService) SignUp(ctx context.Context, req *auth.SignUpRequest) (*aut
 	return &auth.SignUpResponse{
 		TokenStr: tokenStr,
 		User: &auth.User{
-			Id:       createResp.User.GetId(),
-			Username: createResp.User.GetUsername(),
-			Email:    createResp.User.GetEmail(),
+			Id:    createResp.User.GetId(),
+			Email: createResp.User.GetEmail(),
 		},
 	}, nil
 }
@@ -97,9 +95,8 @@ func (s *authService) SignIn(ctx context.Context, req *auth.SignInRequest) (*aut
 	return &auth.SignInResponse{
 		TokenStr: tokenStr,
 		User: &auth.User{
-			Id:       resp.GetUser().GetId(),
-			Username: resp.GetUser().GetUsername(),
-			Email:    resp.GetUser().GetEmail(),
+			Id:    resp.GetUser().GetId(),
+			Email: resp.GetUser().GetEmail(),
 		},
 	}, nil
 }

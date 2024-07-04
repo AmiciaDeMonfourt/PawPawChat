@@ -2,43 +2,42 @@ package web
 
 import "pawpawchat/internal/model/domain"
 
-type UserRequest struct {
-	TokenStr string `json:"token_string"`
+// /api/user
+type GetInfoRequest struct {
 }
 
-type UserResponse struct {
+type GetInfoResponse struct {
 	User domain.User `json:"user"`
 }
 
-///
+// /profile
+type ProfileRequest struct {
+}
 
-type UserSignUpRequest struct {
+type ProfileResponse struct {
+	User domain.User `json:"user"`
+}
+
+// /signup
+type SignUpRequest struct {
+	FirstName  string `json:"first_name"`
+	SecondName string `json:"second_name"`
+	Email      string `json:"email"`
+	Password   string `json:"password"`
+}
+
+type SignUpResponse struct {
+	User     domain.User `json:"user"`
+	TokenStr string      `json:"token_string"`
+}
+
+// /signin
+type SignInRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-type UserSignUpResponse struct {
+type SignInResponse struct {
 	User     domain.User `json:"user"`
 	TokenStr string      `json:"token_string"`
-	Error    string      `json:"error,omitempty"`
-}
-
-type UserSignInRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type UserSignInResponse struct {
-	User     domain.User `json:"user"`
-	TokenStr string      `json:"token_string"`
-	Error    string      `json:"error,omitempty"`
-}
-
-type PageRequest struct {
-	TokenStr string `json:"token_string"`
-}
-
-type PageResponse struct {
-	User  domain.User `json:"user"`
-	Error string      `json:"error,omitempty"`
 }
