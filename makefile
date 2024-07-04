@@ -73,7 +73,7 @@ SERVICES  := users posts
 CREATEDB  := createdb
 PSQL 	  := psql
 
-create_db:
+createdb:
 ifeq ($(call IS_DB_EXISTS,${USERS_DB_USER},${USERS_DB_PASS},${USERS_DB_NAME}),true)
 	@echo "Database $(USERS_DB_NAME) already exists."
 else
@@ -103,13 +103,13 @@ VERBOSE 	 := down up
 
 
 migratenew:
-ifndef d
-	$(error parameter dir is missing d=[..])
+ifndef s
+	$(error parameter dir is missing s=[..])
 endif
-ifndef n
-	$(error parameter sequence is missing s=[..])
+ifndef seq
+	$(error parameter sequence is missing seq=[..])
 endif
-	@$(MIGR) $(CREATE) -ext=$(EXT) -dir=$(d) -seq $(s) 
+	@$(MIGR) $(CREATE) -ext=$(EXT) -dir=$(call FIND_SQL_PATH,./pkg/$(s))  -seq $(seq) 
 
 
 
@@ -138,7 +138,21 @@ define MIGRATE_RUN
 	-verbose $(2)
 endef
 
+define FORCE
+	${MIGR} \
+	-path=$(word $(1),$(SERVICE_MIGR_DIRS)) \
+	-database ${$(word $(1),$(SERVICE_DB_URLS))} \
+	force $(2)
+endef
+
 migrate:
 	@$(foreach n, $(shell seq $(SERVICES_WITH_MIGR_COUNT)), \
 		$(foreach v, $(VERBOSE), \
 			$(call MIGRATE_RUN, $(n), $(v));))
+
+migrateforce:
+ifndef v
+	@echo "missing v=[..] parameter (version)"
+endif
+	@$(foreach n, $(shell seq $(SERVICES_WITH_MIGR_COUNT)), \
+		$(call FORCE, $(n), $(v));)

@@ -3,10 +3,10 @@ package web
 import "pawpawchat/internal/model/domain"
 
 // /api/user
-type GetInfoRequest struct {
+type GetUserInfoRequest struct {
 }
 
-type GetInfoResponse struct {
+type GetUserInfoResponse struct {
 	User domain.User `json:"user"`
 }
 

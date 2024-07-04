@@ -32,7 +32,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.UserResponse"
+                            "$ref": "#/definitions/web.GetUserInfoResponse"
                         }
                     },
                     "404": {
@@ -68,7 +68,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.SignInRequest"
+                            "$ref": "#/definitions/web.SignInRequest"
                         }
                     }
                 ],
@@ -76,7 +76,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.SignInResponse"
+                            "$ref": "#/definitions/web.SignInResponse"
                         }
                     },
                     "404": {
@@ -105,7 +105,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.SignInRequest"
+                            "$ref": "#/definitions/web.SignUpRequest"
                         }
                     }
                 ],
@@ -113,7 +113,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/auth.SignInResponse"
+                            "$ref": "#/definitions/web.SignUpResponse"
                         }
                     },
                     "409": {
@@ -133,8 +133,8 @@ const docTemplate = `{
         },
         "/{username}": {
             "get": {
-                "description": "User's page",
-                "summary": "Page",
+                "description": "The page received basic information about the user",
+                "summary": "Profile",
                 "parameters": [
                     {
                         "type": "string",
@@ -148,7 +148,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/users.GetByUsernameResponse"
+                            "$ref": "#/definitions/web.ProfileResponse"
                         }
                     },
                     "401": {
@@ -168,55 +168,19 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "auth.SignInRequest": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.SignInResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
-                },
-                "tokenStr": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/auth.User"
-                }
-            }
-        },
-        "auth.User": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
         "domain.User": {
             "type": "object",
             "properties": {
                 "email": {
                     "type": "string"
                 },
+                "first_name": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
-                "username": {
+                "second_name": {
                     "type": "string"
                 }
             }
@@ -229,34 +193,67 @@ const docTemplate = `{
                 }
             }
         },
-        "users.GetByUsernameResponse": {
+        "web.GetUserInfoResponse": {
             "type": "object",
             "properties": {
-                "error": {
-                    "type": "string"
-                },
                 "user": {
-                    "$ref": "#/definitions/users.User"
+                    "$ref": "#/definitions/domain.User"
                 }
             }
         },
-        "users.User": {
+        "web.ProfileResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/domain.User"
+                }
+            }
+        },
+        "web.SignInRequest": {
             "type": "object",
             "properties": {
                 "email": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "integer"
-                },
-                "username": {
+                "password": {
                     "type": "string"
                 }
             }
         },
-        "web.UserResponse": {
+        "web.SignInResponse": {
             "type": "object",
             "properties": {
+                "token_string": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/domain.User"
+                }
+            }
+        },
+        "web.SignUpRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "second_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "web.SignUpResponse": {
+            "type": "object",
+            "properties": {
+                "token_string": {
+                    "type": "string"
+                },
                 "user": {
                     "$ref": "#/definitions/domain.User"
                 }

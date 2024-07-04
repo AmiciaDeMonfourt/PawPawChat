@@ -1,36 +1,13 @@
 definitions:
-  auth.SignInRequest:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    type: object
-  auth.SignInResponse:
-    properties:
-      error:
-        type: string
-      tokenStr:
-        type: string
-      user:
-        $ref: '#/definitions/auth.User'
-    type: object
-  auth.User:
-    properties:
-      email:
-        type: string
-      id:
-        type: integer
-      username:
-        type: string
-    type: object
   domain.User:
     properties:
       email:
         type: string
+      first_name:
+        type: string
       id:
         type: integer
-      username:
+      second_name:
         type: string
     type: object
   response.HTTPError:
@@ -38,24 +15,45 @@ definitions:
       error:
         type: string
     type: object
-  users.GetByUsernameResponse:
+  web.GetUserInfoResponse:
     properties:
-      error:
-        type: string
       user:
-        $ref: '#/definitions/users.User'
+        $ref: '#/definitions/domain.User'
     type: object
-  users.User:
+  web.ProfileResponse:
+    properties:
+      user:
+        $ref: '#/definitions/domain.User'
+    type: object
+  web.SignInRequest:
     properties:
       email:
         type: string
-      id:
-        type: integer
-      username:
+      password:
         type: string
     type: object
-  web.UserResponse:
+  web.SignInResponse:
     properties:
+      token_string:
+        type: string
+      user:
+        $ref: '#/definitions/domain.User'
+    type: object
+  web.SignUpRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      password:
+        type: string
+      second_name:
+        type: string
+    type: object
+  web.SignUpResponse:
+    properties:
+      token_string:
+        type: string
       user:
         $ref: '#/definitions/domain.User'
     type: object
@@ -64,7 +62,7 @@ info:
 paths:
   /{username}:
     get:
-      description: User's page
+      description: The page received basic information about the user
       parameters:
       - description: Token
         in: header
@@ -75,7 +73,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/users.GetByUsernameResponse'
+            $ref: '#/definitions/web.ProfileResponse'
         "401":
           description: Unauthorized
           schema:
@@ -84,7 +82,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.HTTPError'
-      summary: Page
+      summary: Profile
   /api/user:
     get:
       description: User info
@@ -98,7 +96,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.UserResponse'
+            $ref: '#/definitions/web.GetUserInfoResponse'
         "404":
           description: Not Found
           schema:
@@ -122,12 +120,12 @@ paths:
         name: requestBody
         required: true
         schema:
-          $ref: '#/definitions/auth.SignInRequest'
+          $ref: '#/definitions/web.SignInRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/auth.SignInResponse'
+            $ref: '#/definitions/web.SignInResponse'
         "404":
           description: Not Found
           schema:
@@ -146,12 +144,12 @@ paths:
         name: requestBody
         required: true
         schema:
-          $ref: '#/definitions/auth.SignInRequest'
+          $ref: '#/definitions/web.SignUpRequest'
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/auth.SignInResponse'
+            $ref: '#/definitions/web.SignUpResponse'
         "409":
           description: Conflict
           schema:

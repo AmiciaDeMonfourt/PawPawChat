@@ -14,7 +14,7 @@ import (
 // @Summary      Profile
 // @Description  The page received basic information about the user
 // @Param        Authorization  header    string              	true  "Token"
-// @Success      200  			{object}  users.GetByUsernameResponse
+// @Success      200  			{object}  web.ProfileResponse
 // @Failure      401  			{object}  response.HTTPError
 // @Failure      500  			{object}  response.HTTPError
 // @Router       /{username} [get]

@@ -1,6 +1,40 @@
 version: '3.8'
 
 services:
+  app:
+    build:
+      context: .
+      dockerfile: ./pkg/s3/dockerfile
+    environment:
+      S3_ADDR: ${S3_ADDR}
+    ports:
+      - ${S3_PORT}:${S3_PORT}
+    depends_on:
+      - auth
+      - users 
+      - s3
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./pkg/auth/dockerfile
+    environment:
+      - USERS_ADDR: ${AUTH_ADDR}
+    ports:
+      - ${AUTH_PORT}:${AUTH_PORT}
+
+  users:
+    build:
+      context: .
+      dockerfile: ./pkg/users/dockerfile
+    environment:
+      - USERS_ADDR: ${USERS_ADDR}
+    ports:
+      - ${USERS_PORT}:${USERS_PORT}
+    depends_on:
+      - auth
+      - postgres
+
   s3:
     build:
       context: .
@@ -9,3 +43,7 @@ services:
       S3_ADDR: ${S3_ADDR}
     ports:
       - ${S3_PORT}:${S3_PORT}
+  
+  postgres:
+    
+    

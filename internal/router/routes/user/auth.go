@@ -109,7 +109,7 @@ func (r *userRoutes) SignIn(w http.ResponseWriter, req *http.Request) {
 // @Summary      User
 // @Description  User info
 // @Param        Authorization  header    string            	true	"Token"
-// @Success      200  			{object}  web.UserResponse
+// @Success      200  			{object}  web.GetUserInfoResponse
 // @Failure      404  			{object}  response.HTTPError
 // @Failure      500  			{object}  response.HTTPError
 // @Router       /api/user [get]
@@ -134,5 +134,5 @@ func (r *userRoutes) GetInfo(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	response.OK(w, web.GetInfoResponse{User: *user})
+	response.OK(w, web.GetUserInfoResponse{User: *user})
 }

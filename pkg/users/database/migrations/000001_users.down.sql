@@ -1,0 +1,6 @@
+-- DROP INDEXES
+DROP INDEX IF EXISTS idx_users_username;
+
+-- DROP TABLE
+DROP TABLE IF EXISTS users CASCADE;
+
