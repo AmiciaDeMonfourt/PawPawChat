@@ -6,20 +6,19 @@
     justify-content: space-between;
 }
 
-
 .item {
     display: flex;
     align-items: center;
-  }
-  
-  .icon {
+}
+
+.icon {
     margin-right: 5px;
     fill: var(--text-color);
-  }
-  
-  .Options {
-    list-style: none; 
-  }
+}
+
+.Options {
+    list-style: none;
+}
 
 .user {
     margin-bottom: 20px;

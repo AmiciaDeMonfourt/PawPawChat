@@ -1,0 +1,9 @@
+**/.git
+**/node_modules
+build
+config
+public
+tsconfig.json
+webpack.config.ts
+package-lock.json
+package.json

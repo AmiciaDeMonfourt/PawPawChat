@@ -1,12 +1,12 @@
-import { classNames } from "shared/lib/classNames/classNames";
-import cls from "./ProfilePanel.module.scss";
-import { Text } from "shared/ui/Text/Text";
+import { classNames } from 'shared/lib/classNames/classNames';
+import cls from './ProfilePanel.module.scss';
+import { Text } from 'shared/ui/Text/Text';
 
 interface ProfilePanelProps {
-    className?: string
+    className?: string;
 }
 
-export const ProfilePanel = ({className} : ProfilePanelProps) => {
+export const ProfilePanel = ({ className }: ProfilePanelProps) => {
     return (
         <div className={classNames(cls.ProfilePanel, {}, [className])}>
             <div className={cls.person}>
@@ -26,9 +26,7 @@ export const ProfilePanel = ({className} : ProfilePanelProps) => {
                     </li>
                 </ul>
             </div>
-            <div className={cls.friends}>
-                
-            </div>
+            <div className={cls.friends}></div>
         </div>
-    )
-}
+    );
+};

@@ -1,1 +1,1 @@
-export {StatsPanel} from "./ui/StatsPanel"
+export { StatsPanel } from './ui/StatsPanel';

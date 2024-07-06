@@ -1,53 +1,59 @@
-import { classNames } from "shared/lib/classNames/classNames";
-import cls from "./SignUpForm.module.scss";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "app/providers/StoreProvider/config/store";
-import { SignUp } from "../model/service/SignUp";
-import { Button, ButtonTheme } from "shared/ui/Button/Button";
-import { AppRoutes, RoutesPaths } from "shared/config/routeConfig/routeConfig";
-import { AppLink } from "shared/ui/AppLink/AppLink";
-import { Input } from "shared/ui/Input/Input";
-import { getSignUp } from "../model/selectors/getSignUp/getSignUp";
-import { useCallback } from "react";
-import { signUpActions } from "../model/slice/signUpSlice";
-import { getIsAuth } from "entities/User/model/selectors/getIsAuth";
-import { Navigate } from "react-router-dom";
+import { classNames } from 'shared/lib/classNames/classNames';
+import cls from './SignUpForm.module.scss';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from 'app/providers/StoreProvider/config/store';
+import { SignUp } from '../model/service/SignUp';
+import { Button, ButtonTheme } from 'shared/ui/Button/Button';
+import { AppRoutes, RoutesPaths } from 'shared/config/routeConfig/routeConfig';
+import { AppLink } from 'shared/ui/AppLink/AppLink';
+import { Input } from 'shared/ui/Input/Input';
+import { getSignUp } from '../model/selectors/getSignUp/getSignUp';
+import { useCallback } from 'react';
+import { signUpActions } from '../model/slice/signUpSlice';
+import { getIsAuth } from 'entities/User/model/selectors/getIsAuth';
+import { Navigate } from 'react-router-dom';
 
 interface SignUpFormProps {
-    className?: string
+    className?: string;
 }
 
-export const SignUpForm = ({className} : SignUpFormProps) => {
-
+export const SignUpForm = ({ className }: SignUpFormProps) => {
     const dispatch = useDispatch<AppDispatch>();
-    const data =useSelector(getSignUp);
+    const data = useSelector(getSignUp);
     const isAuth = useSelector(getIsAuth);
 
-    const {
-        Username,
-        Email,
-        Password,
-        errors
-    } = data;
+    const { Username, Email, Password, errors } = data;
 
-    const onUsernameChange = useCallback((value: string) => {
-        dispatch(signUpActions.setUsername(value));
-    }, [dispatch]);
+    const onUsernameChange = useCallback(
+        (value: string) => {
+            dispatch(signUpActions.setUsername(value));
+        },
+        [dispatch],
+    );
 
-    const onEmailChange = useCallback((value: string) => {
-        dispatch(signUpActions.setEmail(value));
-    }, [dispatch]);
+    const onEmailChange = useCallback(
+        (value: string) => {
+            dispatch(signUpActions.setEmail(value));
+        },
+        [dispatch],
+    );
 
-    const onPasswordChange = useCallback((value: string) => {
-        dispatch(signUpActions.setPassword(value));
-    }, [dispatch]);
+    const onPasswordChange = useCallback(
+        (value: string) => {
+            dispatch(signUpActions.setPassword(value));
+        },
+        [dispatch],
+    );
 
-    const onSignUp = useCallback((e : any) => {
-        e.preventDefault();
-        dispatch(SignUp());
-    }, [dispatch]);
+    const onSignUp = useCallback(
+        (e: any) => {
+            e.preventDefault();
+            dispatch(SignUp());
+        },
+        [dispatch],
+    );
 
-    if(isAuth) return <Navigate to={RoutesPaths[AppRoutes.HOME]} />
+    if (isAuth) return <Navigate to={RoutesPaths[AppRoutes.HOME]} />;
 
     return (
         <div className={classNames(cls.SignUpForm, {}, [className])}>
@@ -75,14 +81,13 @@ export const SignUpForm = ({className} : SignUpFormProps) => {
                     value={Password}
                     onChange={onPasswordChange}
                 />
-                <Button
-                    onClick={onSignUp}
-                    theme={ButtonTheme.CLASSIC}
-                >
+                <Button onClick={onSignUp} theme={ButtonTheme.CLASSIC}>
                     Зарегистрироваться
                 </Button>
             </form>
-        <AppLink className={cls.noAcc} to={RoutesPaths[AppRoutes.SIGN_IN]}>У меня уже есть аккаунт</AppLink>
+            <AppLink className={cls.noAcc} to={RoutesPaths[AppRoutes.SIGN_IN]}>
+                У меня уже есть аккаунт
+            </AppLink>
         </div>
-    )
-}
+    );
+};

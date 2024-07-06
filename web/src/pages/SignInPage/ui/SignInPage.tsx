@@ -1,13 +1,15 @@
-import { SignInForm } from "features/SignIn";
-import { ContentWrapper, PageAlign } from "shared/ui/ContentWrapper/ContentWrapper";
+import { SignInForm } from 'features/SignIn';
+import {
+    ContentWrapper,
+    PageAlign,
+} from 'shared/ui/ContentWrapper/ContentWrapper';
 
 const SignInPage = () => {
-
     return (
         <ContentWrapper fullscreen={true} align={PageAlign.CENTER}>
-            <SignInForm/>
+            <SignInForm />
         </ContentWrapper>
-    )
-}
+    );
+};
 
 export default SignInPage;
