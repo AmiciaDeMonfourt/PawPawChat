@@ -10,7 +10,7 @@
     "prettier:fix": "npx prettier src/**/*.{ts,tsx,scss} --write",
     "prettier:check": "npx prettier src/**/*.{ts,tsx,scss} --check",
     "unit": "jest --config ./config/jest/jest.config.ts",
-    "mock-server": "json-server --watch config/mock/db.json"
+    "mock-server": "json-server --watch config/mock/db.json --port 3001"
   },
   "keywords": [],
   "author": "",

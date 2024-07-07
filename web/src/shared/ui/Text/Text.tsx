@@ -9,19 +9,31 @@ export enum TextSize {
     XL = 'xl',
 }
 
+export enum TextTheme {
+    TRANSPARENT = 'transparent',
+}
+
 interface TextProps {
     className?: string;
     children: ReactNode;
     textSize?: TextSize;
+    textTheme?: TextTheme;
 }
 
 export const Text = ({
     className,
     children,
     textSize = TextSize.MEDIUM,
+    textTheme,
 }: TextProps) => {
     return (
-        <p className={classNames(cls.Text, {}, [className, textSize])}>
+        <p
+            className={classNames(cls.Text, {}, [
+                className,
+                textSize,
+                cls[textTheme],
+            ])}
+        >
             {children}
         </p>
     );

@@ -4,8 +4,9 @@ export interface User {
     email: string;
 }
 
-export interface UserShema {
+export interface UserSchema {
     UserData?: User;
     isInit: boolean;
     isAuth: boolean;
 }
+

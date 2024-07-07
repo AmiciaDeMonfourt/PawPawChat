@@ -2,21 +2,24 @@
     "chats": [
         {
             "id" : 1,
-            "name": "Андрей пиво",
+            "name": "Андрей Пиво",
             "last_message": "Ну шо ты лысый?",
-            "last_message_time": "2024-07-07T09:52:00.281Z"
+            "last_message_time": "2024-07-07T11:37:12.323Z",
+            "unread": 0
         },
         {
-            "id" : 1,
-            "name": "Ярослав водка",
+            "id" : 2,
+            "name": "Ярослав Мудрый",
             "last_message": "ААХАХАХАХАХАХАХАХАХ",
-            "last_message_time": "2024-07-07T09:52:00.281Z"
+            "last_message_time": "2024-07-05T09:00:00.281Z",
+            "unread": 10
         },
         {
-            "id" : 1,
+            "id" : 3,
             "name": "Геннадий Горин",
             "last_message": "Что вы делаете в моем холодильнике?",
-            "last_message_time": "2024-07-07T09:52:00.281Z"
+            "last_message_time": "2024-07-07T09:52:00.281Z",
+            "unread": 5
         }
     ]
 }

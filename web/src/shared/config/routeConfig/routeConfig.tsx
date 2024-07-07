@@ -1,3 +1,4 @@
+import ChatsPage from 'pages/ChatsPage/ui/ChatsPage';
 import { MainPage } from 'pages/MainPage';
 import NotFoundPage from 'pages/NotFoundPage/ui/NotFoundPage';
 import { ProfilePage } from 'pages/ProfilePage/ui/ProfilePage';
@@ -10,8 +11,10 @@ export enum AppRoutes {
     FEED = 'feed',
     SIGN_UP = 'sign_up',
     SIGN_IN = 'sign_in',
-    NOT_FOUND = 'not_found',
     PROFILE = 'profile',
+    CHATS = 'chats',
+
+    NOT_FOUND = 'not_found',
 }
 
 export type AppRoutesProps = RouteProps & {
@@ -21,9 +24,12 @@ export type AppRoutesProps = RouteProps & {
 export const RoutesPaths: Record<AppRoutes, string> = {
     [AppRoutes.ROOT]: '/',
     [AppRoutes.FEED]: '/feed',
+
     [AppRoutes.SIGN_IN]: '/sign_in',
     [AppRoutes.SIGN_UP]: '/sign_up',
     [AppRoutes.PROFILE]: '/profile/:username',
+    [AppRoutes.CHATS]: '/chats',
+
     [AppRoutes.NOT_FOUND]: '*',
 };
 
@@ -49,6 +55,11 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
     [AppRoutes.PROFILE]: {
         path: RoutesPaths.profile,
         element: <ProfilePage />,
+        authOnly: true,
+    },
+    [AppRoutes.CHATS]: {
+        path: RoutesPaths.chats,
+        element: <ChatsPage />,
         authOnly: true,
     },
     [AppRoutes.NOT_FOUND]: {

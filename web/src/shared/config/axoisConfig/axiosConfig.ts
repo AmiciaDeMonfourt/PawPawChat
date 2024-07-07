@@ -1,8 +1,12 @@
-import axios from "axios";
-import { LOCAL_STORAGE_TOKEN_KEY } from "shared/consts/localstorage";
+import axios from 'axios';
+import { LOCAL_STORAGE_TOKEN_KEY } from 'shared/consts/localstorage';
 
 export const $api = axios.create({
     baseURL: 'http://localhost:8080/',
+});
+
+export const $mockApi = axios.create({
+    baseURL: 'http://localhost:3001/',
 });
 
 $api.interceptors.request.use((config) => {

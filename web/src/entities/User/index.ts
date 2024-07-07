@@ -1,2 +1,3 @@
 export { userActions, userReducer } from './model/slice/userSlice';
-export { User, UserShema } from './model/types/userSchema';
+export { User, UserSchema } from './model/types/userSchema';
+

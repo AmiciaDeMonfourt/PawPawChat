@@ -1,0 +1,45 @@
+.ChatItem {
+    width: 60%;
+    height: 70px;
+    list-style: none;
+}
+
+.link {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--text-color);
+    text-decoration: none;
+
+    &:hover {
+        background-color: var(--ui-color);
+    }
+}
+
+.avatar {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    background-color: var(--additional-color);
+    margin-right: 20px;
+}
+
+.chatInfo {
+    display: flex;
+}
+
+.rightBlock {
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+}
+
+.unread {
+    background-color: var(--additional-color);
+    height: 20px;
+    padding: 5px;
+    border-radius: var(--default-border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

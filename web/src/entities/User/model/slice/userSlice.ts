@@ -1,10 +1,10 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { User, UserShema } from '../types/userSchema';
+import { User, UserSchema } from '../types/userSchema';
 import { SignInResponse } from 'features/SignIn/model/types/SignInResponse';
 import { LOCAL_STORAGE_TOKEN_KEY } from 'shared/consts/localstorage';
 import { initUser } from '../service/initUser';
 
-const initialState: UserShema = {
+const initialState: UserSchema = {
     UserData: null,
     isInit: false,
     isAuth: false,
@@ -57,3 +57,4 @@ export const userSlice = createSlice({
 
 export const { actions: userActions } = userSlice;
 export const { reducer: userReducer } = userSlice;
+
