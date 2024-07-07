@@ -8,55 +8,58 @@ import Exit from 'shared/assets/icons/exit_to_app.svg';
 import Feed from 'shared/assets/icons/view_agenda.svg';
 
 import { IconLabel } from 'shared/ui/IconLabel/IconLabel';
-import { Text } from 'shared/ui/Text/Text';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUser } from 'entities/User/model/selectors/getUser';
 import { Button, ButtonTheme } from 'shared/ui/Button/Button';
 import { AppDispatch } from 'app/providers/StoreProvider/config/store';
 import { userActions } from 'entities/User';
+import { useTranslation } from 'react-i18next';
 
 export const SidebarContent = () => {
     const user = useSelector(getUser);
     const dispatch = useDispatch<AppDispatch>();
-
+    const { t } = useTranslation();
     const onLogout = () => dispatch(userActions.logout());
 
     return (
         <div className={cls.SidebarContent}>
             <div className={cls.TopPanel}>
-                <Text className={cls.user}>{user?.username}</Text>
                 <ul className={cls.Options}>
-                    <li>
+                    <li className={cls.Option}>
                         <AppLink
                             className={cls.option}
                             theme={AppLinkTheme.CLEAR}
-                            to={'/profile'}
+                            to={'/feed'}
                         >
-                            <IconLabel icon={Feed} text={'Лента'} />
+                            <IconLabel icon={Feed} text={t('Feed')} />
                         </AppLink>
                     </li>
-                    <li>
+                    <li className={cls.Option}>
                         <AppLink theme={AppLinkTheme.CLEAR} to={'/chats'}>
-                            <IconLabel icon={Chats} text={'Чаты'} />
+                            <IconLabel icon={Chats} text={t('Chats')} />
                         </AppLink>
                     </li>
-                    <li>
-                        <AppLink theme={AppLinkTheme.CLEAR} to={'/profile'}>
-                            <IconLabel icon={Profile} text={'Профиль'} />
+                    <li className={cls.Option}>
+                        <AppLink
+                            theme={AppLinkTheme.CLEAR}
+                            to={`/profile/${user.username}`}
+                        >
+                            <IconLabel icon={Profile} text={t('Profile')} />
                         </AppLink>
                     </li>
-                    <li>
+                    <li className={cls.Option}>
                         <AppLink theme={AppLinkTheme.CLEAR} to={'/settings'}>
-                            <IconLabel icon={Settings} text={'Настройки'} />
+                            <IconLabel icon={Settings} text={t('Settings')} />
                         </AppLink>
                     </li>
                 </ul>
             </div>
             <div className={cls.BottomPanel}>
                 <Button theme={ButtonTheme.CLEAR} onClick={onLogout}>
-                    <IconLabel icon={Exit} text={'Выйти'} />
+                    <IconLabel icon={Exit} text={t('Exit')} />
                 </Button>
             </div>
         </div>
     );
 };
+

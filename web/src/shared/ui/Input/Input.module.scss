@@ -6,6 +6,7 @@
     }
     color: var(--text-color);
     background-color: inherit;
+    border-radius: var(--default-border-radius);
 }
 
 .wrapper {
@@ -24,3 +25,4 @@
         height: 20px;
     }
 }
+

@@ -1,13 +1,11 @@
 @font-face {
-    font-family: 'PawPaw';
-    src: url('shared/assets/fonts/PawPaw-R.woff');
-    // url("shared/assets/fonts/LXGWWenKaiMonoTC-Bold.woff") format("woff"),
-    // url("shared/assets/fonts/LXGWWenKaiMonoTC-Light.woff") format("woff");
+    font-family: 'Outfit';
+    src: url('shared/assets/fonts/Outfit-Regular.woff');
 }
 
 :root {
     //fonts
-    --font-family-main: 'PawPaw', monospace;
+    --font-family-main: 'Outfit', monospace;
 
     --font-size-xl: 48px;
     --font-line-xl: 64px;
@@ -30,4 +28,8 @@
 
     //sizes
     --navbar-height: 50px;
+
+    --default-border-radius: 7px;
+    //colors
 }
+

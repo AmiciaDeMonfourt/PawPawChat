@@ -1,7 +1,7 @@
 .Button {
     cursor: pointer;
     color: var(--text-color);
-    font: var(--font-small);
+    border-radius: var(--default-border-radius);
 }
 
 .clear {
@@ -18,18 +18,10 @@
     background-color: var(--additional-color);
 }
 
-.small {
-    font: var(--font-small);
+.colored {
+    padding: 5px;
+    outline: none;
+    border: 1px solid var(--text-color);
+    background-color: var(--ui-color);
 }
 
-.medium {
-    font: var(--font-medium);
-}
-
-.large {
-    font: var(--font-large);
-}
-
-.xl {
-    font: var(--font-xl);
-}

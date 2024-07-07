@@ -11,6 +11,15 @@
     align-items: center;
 }
 
+.user {
+    display: flex;
+    align-items: center;
+}
+
+.avatar {
+    margin-right: 5px;
+}
+
 .icon {
     margin-right: 5px;
     fill: var(--text-color);
@@ -20,6 +29,14 @@
     list-style: none;
 }
 
+.Option {
+    padding: 3px;
+    border-radius: var(--default-border-radius);
+    &:hover {
+        background-color: var(--ui-color);
+    }
+}
+
 .user {
     margin-bottom: 20px;
 }
@@ -27,3 +44,4 @@
 .option {
     margin-bottom: 10px;
 }
+

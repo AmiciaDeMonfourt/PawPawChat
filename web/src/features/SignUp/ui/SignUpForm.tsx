@@ -12,6 +12,7 @@ import { useCallback } from 'react';
 import { signUpActions } from '../model/slice/signUpSlice';
 import { getIsAuth } from 'entities/User/model/selectors/getIsAuth';
 import { Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface SignUpFormProps {
     className?: string;
@@ -21,6 +22,7 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const data = useSelector(getSignUp);
     const isAuth = useSelector(getIsAuth);
+    const { t } = useTranslation();
 
     const { Username, Email, Password, errors } = data;
 
@@ -53,11 +55,11 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
         [dispatch],
     );
 
-    if (isAuth) return <Navigate to={RoutesPaths[AppRoutes.HOME]} />;
+    if (isAuth) return <Navigate to={RoutesPaths[AppRoutes.FEED]} />;
 
     return (
         <div className={classNames(cls.SignUpForm, {}, [className])}>
-            <h1 className={cls.title}>Регистрация</h1>
+            <h1 className={cls.title}>{t('Sign up')}</h1>
             <form className={cls.form}>
                 <Input
                     type="text"
@@ -81,13 +83,14 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
                     value={Password}
                     onChange={onPasswordChange}
                 />
-                <Button onClick={onSignUp} theme={ButtonTheme.CLASSIC}>
-                    Зарегистрироваться
+                <Button onClick={onSignUp} theme={ButtonTheme.COLORED}>
+                    {t('Sign up btn')}
                 </Button>
             </form>
             <AppLink className={cls.noAcc} to={RoutesPaths[AppRoutes.SIGN_IN]}>
-                У меня уже есть аккаунт
+                {t('I already have an account')}
             </AppLink>
         </div>
     );
 };
+

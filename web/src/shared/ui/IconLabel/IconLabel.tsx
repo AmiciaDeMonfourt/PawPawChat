@@ -17,3 +17,4 @@ export const IconLabel = ({ className, icon: Icon, text }: IconLabelProps) => {
         </div>
     );
 };
+

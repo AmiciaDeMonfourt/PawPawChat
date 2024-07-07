@@ -5,6 +5,7 @@ import { ButtonHTMLAttributes, FC, ReactNode } from 'react';
 export enum ButtonTheme {
     CLEAR = 'clear',
     CLASSIC = 'classic',
+    COLORED = 'colored',
 }
 
 export enum ButtonFont {
@@ -34,7 +35,7 @@ export const Button: FC<ButtonProps> = (props) => {
             className={classNames(cls.Button, {}, [
                 className,
                 cls[theme],
-                cls[fontSize],
+                fontSize,
             ])}
             {...otherProps}
         >
@@ -42,3 +43,4 @@ export const Button: FC<ButtonProps> = (props) => {
         </button>
     );
 };
+

@@ -6,6 +6,7 @@
     width: 400px;
     height: 450px;
     background-color: var(--additional-color);
+    border-radius: var(--default-border-radius);
 }
 
 .form {
@@ -34,3 +35,4 @@
 .noAcc {
     font-style: italic;
 }
+
