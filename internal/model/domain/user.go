@@ -2,7 +2,6 @@ package domain
 
 import (
 	"pawpawchat/generated/proto/auth"
-	"pawpawchat/generated/proto/users"
 )
 
 type User struct {
@@ -15,11 +14,11 @@ type User struct {
 
 func NewUser(in any) *User {
 	switch input := in.(type) {
-	case *users.GetByIdResponse:
-		return &User{
-			Id:    input.GetUser().Id,
-			Email: input.GetUser().Email,
-		}
+	// case *users.GetByIdResponse:
+	// 	return &User{
+	// 		Id:    input.GetUser().Id,
+	// 		Email: input.GetUser().Email,
+	// 	}
 	case *auth.SignInResponse:
 		return &User{
 			Id:         input.GetUser().Id,

@@ -1,6 +1,7 @@
-package grpcclient
+package grpc
 
 import (
+	"log"
 	"os"
 	"pawpawchat/generated/proto/auth"
 	"pawpawchat/generated/proto/users"
@@ -14,13 +15,18 @@ type Client struct {
 	auth  auth.AuthServiceClient
 }
 
-func New() (*Client, error) {
-	usersConn, err := grpc.NewClient(os.Getenv("USERS_ADDR"), grpc.WithTransportCredentials(insecure.NewCredentials()))
+func NewClient() (*Client, error) {
+	log.Println("New gRPCClient start:")
+
+	usersAddr := os.Getenv("USERS_ADDR")
+	authAddr := os.Getenv("AUTH_ADDR")
+
+	usersConn, err := grpc.NewClient(usersAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
 
-	authConn, err := grpc.NewClient(os.Getenv("AUTH_ADDR"), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	authConn, err := grpc.NewClient(authAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

@@ -1,49 +1,91 @@
 version: '3.8'
 
 services:
+  # API GATEWAY SERVICE
   app:
+    container_name: app
     build:
-      context: .
-      dockerfile: ./pkg/s3/dockerfile
+      dockerfile: ./dockerfile
     environment:
-      S3_ADDR: ${S3_ADDR}
+      - AUTH_ADDR=auth:${AUTH_PORT}
+      - USERS_ADDR=users:${USERS_PORT}
     ports:
-      - ${S3_PORT}:${S3_PORT}
+      - ${APP_PORT}:${APP_PORT}
     depends_on:
       - auth
-      - users 
-      - s3
+      - users
+      - kafka
 
+  # AUTH SERVICE
   auth:
+    container_name: auth
     build:
-      context: .
       dockerfile: ./pkg/auth/dockerfile
-    environment:
-      - USERS_ADDR: ${AUTH_ADDR}
     ports:
       - ${AUTH_PORT}:${AUTH_PORT}
-
-  users:
-    build:
-      context: .
-      dockerfile: ./pkg/users/dockerfile
-    environment:
-      - USERS_ADDR: ${USERS_ADDR}
-    ports:
-      - ${USERS_PORT}:${USERS_PORT}
     depends_on:
-      - auth
-      - postgres
+      - auth_db
+      - kafka
 
-  s3:
-    build:
-      context: .
-      dockerfile: ./pkg/s3/dockerfile
+  auth_db:
+    image: postgres:latest
+    container_name: auth_db
     environment:
-      S3_ADDR: ${S3_ADDR}
-    ports:
-      - ${S3_PORT}:${S3_PORT}
+      - POSTGRES_USER=${AUTH_DB_USER}
+      - POSTGRES_PASSWORD=${AUTH_DB_PASS}
+      - POSTGRES_DB=${AUTH_DB_NAME}
+    volumes:
+      - authdb_data:/var/lib/postgresql/data
   
-  postgres:
+  # USERS SERVICE
+  users:
+    container_name: users
+    build:
+      dockerfile: /pkg/users/dockerfile
+    environment:
+    - AUTH_ADDR=auth:${AUTH_PORT}
+    - USERS_DB_DRIVER
+    - USERS_DB_URL=postgres://${USERS_DB_USER}:${USERS_DB_PASS}@users_db:${USERS_DB_PORT}/${USERS_DB_NAME}?sslmode=disable
+    depends_on:
+      - users_db
+      - kafka
+
+  users_db:
+    image: postgres:latest
+    container_name: users_db
+    ports:
+      - ${USERS_DB_PORT}:${USERS_DB_PORT}
+    environment:
+      - POSTGRES_USER=${USERS_DB_USER}
+      - POSTGRES_PASSWORD=${USERS_DB_PASS}
+      - POSTGRES_DB=${USERS_DB_NAME}
+    volumes:
+      - usersdb_data:/var/lib/postgresql/data
     
-    
+  # KAFKA BROKER
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka-broker
+    ports:
+      - ${KAFKA_PORT}:${KAFKA_PORT}
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:${ZOOKEEPER_PORT}
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:${KAFKA_PORT}
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+    depends_on:
+      - zookeeper
+  
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    ports:
+      - ${ZOOKEEPER_PORT}:${ZOOKEEPER_PORT}
+    environment:
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_PORT}
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - "zookeeper_data:/confluentinc/data"
+
+volumes:
+  usersdb_data:
+  authdb_data:
+  zookeeper_data:

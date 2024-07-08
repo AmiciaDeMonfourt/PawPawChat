@@ -24,18 +24,25 @@ PROTOC      := protoc
 GO_OUT      := --go_out
 GO_GRPC_OUT := --go-grpc_out
 SOURCE_PATH := api/proto
-TARGET_PATH := source_relative:generated/proto
-PROTOC_OPTS := $(GO_OUT)=$(TARGET_PATH)/$(1) $(GO_GRPC_OUT)=$(TARGET_PATH)/$(1)
+TARGET_PATH := paths=source_relative:generated/proto
+
+define PROTOC_OPTIONS
+$(GO_OUT)=$(TARGET_PATH)/$1 $(GO_GRPC_OUT)=$(TARGET_PATH)/$1
+endef
 
 define GENERATE_PROTO
-	@$(PROTOC) -I $(SOURCE_PATH)/$(1) $(call PROTOC_OPTS, $(1)) $(SOURCE_PATH)/$(1)/$(1).proto
+	$(PROTOC) \
+	-I $(SOURCE_PATH)/$(1) \
+	$(call PROTOC_OPTIONS,$(1)) \
+	$(SOURCE_PATH)/$(1)/$(1).proto
 endef
 
 pb: 
 ifndef s
 	@$(error parameter [s] "service name" is required)
 endif
-	@$(call GENERATE_PROTO,${s})
+	$(call GENERATE_PROTO,${s})
+
 
 ############################################################################
 																		   

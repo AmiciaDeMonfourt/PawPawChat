@@ -1,0 +1,18 @@
+FROM golang:1.22
+
+RUN apt-get update && apt-get install -y \
+    bash \
+    git \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+WORKDIR /users
+COPY . .
+
+RUN go mod tidy
+RUN go build -o main ./cmd/users/main.go
+
+EXPOSE ${USERS_PORT}
+
+CMD ["./main"]

@@ -2,31 +2,39 @@ package model
 
 import (
 	"pawpawchat/generated/proto/users"
-	"pawpawchat/pkg/users/utils"
+	"strconv"
+	"time"
 
-	"golang.org/x/crypto/bcrypt"
+	"database/sql"
 )
 
 type User struct {
-	ID       uint64 `json:"id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	HashPass string `json:"-"`
+	ID         uint64         `db:"id" json:"id"`
+	Username   string         `db:"username" json:"username"`
+	FirstName  string         `db:"first_name" json:"first_name"`
+	SecondName string         `db:"second_name" json:"second_name"`
+	Online     bool           `db:"online" json:"online"`
+	LastSeen   time.Time      `db:"last_seen" json:"last_seen"`
+	Age        int            `db:"age" json:"age"`
+	Birthday   sql.NullString `db:"birthday" json:"birthday,omitempty"`
+	CreatedAt  time.Time      `db:"created_at" json:"created_at"`
+	IsBlocked  bool           `db:"is_blocked" json:"is_blocked"`
 }
 
-func NewUser(req *users.CreateRequest) (*User, error) {
-	hashPass, err := utils.EncryptString(req.GetPassword())
-	if err != nil {
-		return nil, err
+func NewUser(in any) *User {
+	switch input := in.(type) {
+	case *users.CreateRequest:
+		return &User{
+			ID:         input.GetUserID(),
+			FirstName:  input.GetFirstName(),
+			SecondName: input.GetSecondName(),
+			Username:   generateUsername(input.GetUserID()),
+		}
 	}
-
-	return &User{
-		Username: req.GetUsername(),
-		Email:    req.GetEmail(),
-		HashPass: hashPass,
-	}, nil
+	return nil
 }
 
-func (u *User) ValidatePassword(password string) error {
-	return bcrypt.CompareHashAndPassword([]byte(u.HashPass), []byte(password))
+// REFACTOR
+func generateUsername(id uint64) string {
+	return "123_" + strconv.Itoa(int(id))
 }

@@ -4,14 +4,14 @@ import (
 	"context"
 	"net/http"
 	"pawpawchat/generated/proto/auth"
-	"pawpawchat/internal/grpcclient"
+	"pawpawchat/internal/grpc"
 	"pawpawchat/internal/server/response"
 	"strings"
 )
 
 type CtxString string
 
-func Auth(client *grpcclient.Client, next http.HandlerFunc) http.HandlerFunc {
+func Auth(client *grpc.Client, next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tokenBearer := r.Header.Get("Authorization")
 		if tokenBearer == "" {

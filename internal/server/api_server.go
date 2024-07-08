@@ -28,8 +28,10 @@ func Start() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	log.Printf("app service server start at %s", os.Getenv("APP_ADDR"))
+
+	log.Printf("connected with user service on: %s", os.Getenv("USER_ADDR"))
+	log.Printf("connected with auth service on: %s", os.Getenv("AUTH_ADDR"))
 
 	http.Serve(listener, server)
 }

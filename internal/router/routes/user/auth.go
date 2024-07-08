@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"pawpawchat/generated/proto/auth"
-	"pawpawchat/generated/proto/users"
-	"pawpawchat/internal/middleware"
 	"pawpawchat/internal/model/domain"
 	"pawpawchat/internal/model/web"
 	"pawpawchat/internal/server/response"
@@ -21,6 +19,8 @@ import (
 // @Failure      500  			{object}  response.HTTPError
 // @Router       /signup [post]
 func (r *userRoutes) SignUp(w http.ResponseWriter, req *http.Request) {
+	r.producer.Send()
+
 	signUpReq := &web.SignUpRequest{}
 
 	if err := json.NewDecoder(req.Body).Decode(&signUpReq); err != nil {
@@ -114,25 +114,25 @@ func (r *userRoutes) SignIn(w http.ResponseWriter, req *http.Request) {
 // @Failure      500  			{object}  response.HTTPError
 // @Router       /api/user [get]
 func (r *userRoutes) GetInfo(w http.ResponseWriter, req *http.Request) {
-	id := req.Context().Value(middleware.CtxString("user_id"))
+	// id := req.Context().Value(middleware.CtxString("user_id"))
 
-	getByIdParams := &users.GetByIdRequest{Id: id.(uint64)}
-	usersResp, err := r.gRPCClient.Users().GetById(context.TODO(), getByIdParams)
-	if err != nil {
-		response.NotFound(w, err.Error())
-		return
-	}
+	// getByIdParams := &users.GetByIdRequest{Id: id.(uint64)}
+	// usersResp, err := r.gRPCClient.Users().GetById(context.TODO(), getByIdParams)
+	// if err != nil {
+	// 	response.NotFound(w, err.Error())
+	// 	return
+	// }
 
-	if usersResp.GetError() != "" {
-		response.InternalErr(w, usersResp.GetError())
-		return
-	}
+	// if usersResp.GetError() != "" {
+	// 	response.InternalErr(w, usersResp.GetError())
+	// 	return
+	// }
 
-	user := domain.NewUser(usersResp)
-	if user == nil {
-		response.InternalErr(w, "failed to create a user model")
-		return
-	}
+	// user := domain.NewUser(usersResp)
+	// if user == nil {
+	// 	response.InternalErr(w, "failed to create a user model")
+	// 	return
+	// }
 
-	response.OK(w, web.GetUserInfoResponse{User: *user})
+	// response.OK(w, web.GetUserInfoResponse{User: *user})
 }

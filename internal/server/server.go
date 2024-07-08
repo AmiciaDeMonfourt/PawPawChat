@@ -3,7 +3,8 @@ package server
 import (
 	"log"
 	"net/http"
-	"pawpawchat/internal/grpcclient"
+	"pawpawchat/internal/grpc"
+	"pawpawchat/internal/producer"
 	"pawpawchat/internal/router"
 )
 
@@ -12,12 +13,12 @@ type server struct {
 }
 
 func newServer() *server {
-	client, err := grpcclient.New()
+	client, err := grpc.NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	router := router.New(client)
+	router := router.New(client, producer.New())
 	router.Configure()
 
 	return &server{

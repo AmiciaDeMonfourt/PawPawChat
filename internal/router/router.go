@@ -2,8 +2,9 @@ package router
 
 import (
 	"net/http"
-	"pawpawchat/internal/grpcclient"
+	"pawpawchat/internal/grpc"
 	"pawpawchat/internal/middleware"
+	"pawpawchat/internal/producer"
 	"pawpawchat/internal/router/routes"
 	"pawpawchat/internal/router/routes/user"
 
@@ -15,17 +16,19 @@ import (
 
 type Router struct {
 	router      *mux.Router
-	gRPCClient  *grpcclient.Client
+	gRPCClient  *grpc.Client
 	user        routes.User
 	middlewares []middleware.Middleware
+	producer    *producer.Producer
 }
 
-func New(gRPCClient *grpcclient.Client) *Router {
+func New(gRPCClient *grpc.Client, producer *producer.Producer) *Router {
 	return &Router{
 		router:      mux.NewRouter(),
-		user:        user.NewUserRoutes(gRPCClient),
+		user:        user.NewUserRoutes(gRPCClient, producer),
 		middlewares: make([]middleware.Middleware, 0),
 		gRPCClient:  gRPCClient,
+		producer:    producer,
 	}
 }
 

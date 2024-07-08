@@ -7,69 +7,70 @@ option go_package = "generated/proto/users";
 service UsersService {
     rpc Create(CreateRequest) returns (CreateResponse);
 
-    rpc CheckCredentials(CheckCredentialsRequest) returns (CheckCredentialsResponse);
+    // rpc CheckCredentials(CheckCredentialsRequest) returns (CheckCredentialsResponse);
 
-    rpc GetById(GetByIdRequest) returns (GetByIdResponse);
+    // rpc GetById(GetByIdRequest) returns (GetByIdResponse);
     
-    rpc GetByEmail(GetByEmailRequest) returns (GetByEmailResponse);
+    // rpc GetByEmail(GetByEmailRequest) returns (GetByEmailResponse);
 
-    rpc GetByUsername(GetByUsernameRequest) returns (GetByUsernameResponse);
+    // rpc GetByUsername(GetByUsernameRequest) returns (GetByUsernameResponse);
 }
 
 message User {
-    uint64 id       = 1;
-    string username = 2;
-    string email    = 3;
+    uint64 id         = 1;
+    string firstName  = 2;
+    string secondName = 3;
+    string username   = 4;
 }
 
 
 message CreateRequest {
-    string username = 1;
-    string email    = 2;
-    string password = 3;
-}   
+    uint64 userID     = 1;
+    string firstName  = 2;
+    string secondName = 3;
+}
+
 message CreateResponse {
     User   user  = 1;
     string error = 2;
 }
 
 
-message CheckCredentialsRequest {
-    string email    = 1;
-    string password = 2;
-} 
-message CheckCredentialsResponse {
-    string error = 1;
-}
+// message CheckCredentialsRequest {
+//     string email    = 1;
+//     string password = 2;
+// } 
+// message CheckCredentialsResponse {
+//     string error = 1;
+// }
 
 
 
-message GetByEmailRequest{
-    string email = 1;
-}
-message GetByEmailResponse {
-    User   user  = 1;
-    string error = 2;
-}
+// message GetByEmailRequest{
+//     string email = 1;
+// }
+// message GetByEmailResponse {
+//     User   user  = 1;
+//     string error = 2;
+// }
 
 
-message GetByIdRequest {
-    uint64 id = 1;
-} 
+// message GetByIdRequest {
+//     uint64 id = 1;
+// } 
+// message GetByIdResponse {
+//     User   user  = 1;
+//     string error = 2;
+// }
 
-message GetByIdResponse {
-    User   user  = 1;
-    string error = 2;
-}
 
-
-message GetByUsernameRequest {
-    string username = 1;
-} 
-message GetByUsernameResponse {
-    User   user  = 1;
-    string error = 2;
-}
+// message GetByUsernameRequest {
+//     string username = 1;
+// } 
+// message GetByUsernameResponse {
+//     User   user  = 1;
+//     string error = 2;
+// }
 
 
 

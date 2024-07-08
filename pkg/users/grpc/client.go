@@ -1,4 +1,4 @@
-package grpcclient
+package grpc
 
 import (
 	"log"
@@ -9,12 +9,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type GRPCClient struct {
+type Client struct {
 	s3 s3.S3ServiceClient
 }
 
-func New() *GRPCClient {
-	s3ADDR := os.Getenv("")
+func NewClient() *Client {
+	s3ADDR := os.Getenv("S3_ADDR")
 	if s3ADDR == "" {
 		log.Fatal("missing s3 service addr")
 	}
@@ -26,7 +26,7 @@ func New() *GRPCClient {
 
 	s3Client := s3.NewS3ServiceClient(s3Connection)
 
-	return &GRPCClient{
+	return &Client{
 		s3: s3Client,
 	}
 }

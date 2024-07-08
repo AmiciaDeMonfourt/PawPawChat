@@ -19,11 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	UsersService_Create_FullMethodName           = "/users.UsersService/Create"
-	UsersService_CheckCredentials_FullMethodName = "/users.UsersService/CheckCredentials"
-	UsersService_GetById_FullMethodName          = "/users.UsersService/GetById"
-	UsersService_GetByEmail_FullMethodName       = "/users.UsersService/GetByEmail"
-	UsersService_GetByUsername_FullMethodName    = "/users.UsersService/GetByUsername"
+	UsersService_Create_FullMethodName = "/users.UsersService/Create"
 )
 
 // UsersServiceClient is the client API for UsersService service.
@@ -31,10 +27,6 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UsersServiceClient interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
-	CheckCredentials(ctx context.Context, in *CheckCredentialsRequest, opts ...grpc.CallOption) (*CheckCredentialsResponse, error)
-	GetById(ctx context.Context, in *GetByIdRequest, opts ...grpc.CallOption) (*GetByIdResponse, error)
-	GetByEmail(ctx context.Context, in *GetByEmailRequest, opts ...grpc.CallOption) (*GetByEmailResponse, error)
-	GetByUsername(ctx context.Context, in *GetByUsernameRequest, opts ...grpc.CallOption) (*GetByUsernameResponse, error)
 }
 
 type usersServiceClient struct {
@@ -55,55 +47,11 @@ func (c *usersServiceClient) Create(ctx context.Context, in *CreateRequest, opts
 	return out, nil
 }
 
-func (c *usersServiceClient) CheckCredentials(ctx context.Context, in *CheckCredentialsRequest, opts ...grpc.CallOption) (*CheckCredentialsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CheckCredentialsResponse)
-	err := c.cc.Invoke(ctx, UsersService_CheckCredentials_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *usersServiceClient) GetById(ctx context.Context, in *GetByIdRequest, opts ...grpc.CallOption) (*GetByIdResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetByIdResponse)
-	err := c.cc.Invoke(ctx, UsersService_GetById_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *usersServiceClient) GetByEmail(ctx context.Context, in *GetByEmailRequest, opts ...grpc.CallOption) (*GetByEmailResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetByEmailResponse)
-	err := c.cc.Invoke(ctx, UsersService_GetByEmail_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *usersServiceClient) GetByUsername(ctx context.Context, in *GetByUsernameRequest, opts ...grpc.CallOption) (*GetByUsernameResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetByUsernameResponse)
-	err := c.cc.Invoke(ctx, UsersService_GetByUsername_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // UsersServiceServer is the server API for UsersService service.
 // All implementations must embed UnimplementedUsersServiceServer
 // for forward compatibility
 type UsersServiceServer interface {
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
-	CheckCredentials(context.Context, *CheckCredentialsRequest) (*CheckCredentialsResponse, error)
-	GetById(context.Context, *GetByIdRequest) (*GetByIdResponse, error)
-	GetByEmail(context.Context, *GetByEmailRequest) (*GetByEmailResponse, error)
-	GetByUsername(context.Context, *GetByUsernameRequest) (*GetByUsernameResponse, error)
 	mustEmbedUnimplementedUsersServiceServer()
 }
 
@@ -113,18 +61,6 @@ type UnimplementedUsersServiceServer struct {
 
 func (UnimplementedUsersServiceServer) Create(context.Context, *CreateRequest) (*CreateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
-}
-func (UnimplementedUsersServiceServer) CheckCredentials(context.Context, *CheckCredentialsRequest) (*CheckCredentialsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckCredentials not implemented")
-}
-func (UnimplementedUsersServiceServer) GetById(context.Context, *GetByIdRequest) (*GetByIdResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetById not implemented")
-}
-func (UnimplementedUsersServiceServer) GetByEmail(context.Context, *GetByEmailRequest) (*GetByEmailResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetByEmail not implemented")
-}
-func (UnimplementedUsersServiceServer) GetByUsername(context.Context, *GetByUsernameRequest) (*GetByUsernameResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetByUsername not implemented")
 }
 func (UnimplementedUsersServiceServer) mustEmbedUnimplementedUsersServiceServer() {}
 
@@ -157,78 +93,6 @@ func _UsersService_Create_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UsersService_CheckCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckCredentialsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UsersServiceServer).CheckCredentials(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UsersService_CheckCredentials_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UsersServiceServer).CheckCredentials(ctx, req.(*CheckCredentialsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UsersService_GetById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetByIdRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UsersServiceServer).GetById(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UsersService_GetById_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UsersServiceServer).GetById(ctx, req.(*GetByIdRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UsersService_GetByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetByEmailRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UsersServiceServer).GetByEmail(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UsersService_GetByEmail_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UsersServiceServer).GetByEmail(ctx, req.(*GetByEmailRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UsersService_GetByUsername_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetByUsernameRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UsersServiceServer).GetByUsername(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UsersService_GetByUsername_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UsersServiceServer).GetByUsername(ctx, req.(*GetByUsernameRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // UsersService_ServiceDesc is the grpc.ServiceDesc for UsersService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -239,22 +103,6 @@ var UsersService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Create",
 			Handler:    _UsersService_Create_Handler,
-		},
-		{
-			MethodName: "CheckCredentials",
-			Handler:    _UsersService_CheckCredentials_Handler,
-		},
-		{
-			MethodName: "GetById",
-			Handler:    _UsersService_GetById_Handler,
-		},
-		{
-			MethodName: "GetByEmail",
-			Handler:    _UsersService_GetByEmail_Handler,
-		},
-		{
-			MethodName: "GetByUsername",
-			Handler:    _UsersService_GetByUsername_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
