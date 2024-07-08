@@ -2,28 +2,62 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"log"
 	"pawpawchat/generated/proto/auth"
 	"pawpawchat/pkg/auth/client"
+	"pawpawchat/pkg/auth/consumer"
 	"pawpawchat/pkg/auth/database"
+	"pawpawchat/pkg/auth/model"
+
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-type authService struct {
-	client *client.Client
-	db     *database.DataBase
+type AuthService struct {
+	client        *client.Client
+	db            *database.DataBase
+	KafkaConsumer *consumer.Consumer
 	auth.UnsafeAuthServiceServer
 }
 
-func new() (*authService, error) {
+// REFACTIOR
+func new() (*AuthService, error) {
 	// Creating new grpc client with connection to other microservices
 	client, err := client.New()
 	if err != nil {
 		return nil, err
 	}
 
-	return &authService{
-		client: client,
-		db:     database.New(),
+	return &AuthService{
+		client:        client,
+		db:            database.New(),
+		KafkaConsumer: consumer.New("kafka:9092", "user_signup"),
 	}, nil
+}
+
+func (s *AuthService) proccessMessage() {
+	log.Printf("message processing is started")
+	for msg := range s.KafkaConsumer.MsgChannel {
+		go func(msg *kafka.Message) {
+			log.Printf("message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+
+			var signUpReq model.AuthInfo
+			if err := json.Unmarshal(msg.Value, &signUpReq); err != nil {
+				log.Printf("failed to unmarshal message: %v", err)
+				return
+			}
+
+			if err := s.UserSignUp(context.TODO(), &signUpReq); err != nil {
+				log.Printf("failed to process sign up request: %v", err)
+				return
+			}
+
+		}(msg)
+	}
+}
+
+func (s *AuthService) UserSignUp(ctx context.Context, req *model.AuthInfo) error {
+	return s.db.AuthInfo().Create(ctx, req)
 }
 
 // createResp, err := s.client.Users().Create(ctx, &users.CreateRequest{
@@ -58,7 +92,7 @@ func new() (*authService, error) {
 // 	},
 // }, nil
 
-func (s *authService) SignIn(ctx context.Context, req *auth.SignInRequest) (*auth.SignInResponse, error) {
+func (s *AuthService) SignIn(ctx context.Context, req *auth.SignInRequest) (*auth.SignInResponse, error) {
 	return nil, nil
 }
 
@@ -99,7 +133,7 @@ func (s *authService) SignIn(ctx context.Context, req *auth.SignInRequest) (*aut
 // 	}, nil
 // }
 
-func (s *authService) CheckAuth(ctx context.Context, req *auth.CheckAuthRequest) (*auth.CheckAuthResponse, error) {
+func (s *AuthService) CheckAuth(ctx context.Context, req *auth.CheckAuthRequest) (*auth.CheckAuthResponse, error) {
 	return nil, nil
 }
 

@@ -1,12 +1,13 @@
 package database
 
 import (
-	"database/sql"
 	"log"
 	"os"
 	"pawpawchat/pkg/auth/database/repository"
+	"pawpawchat/pkg/auth/model"
 
-	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type DataBase struct {
@@ -14,23 +15,18 @@ type DataBase struct {
 }
 
 func New() *DataBase {
-	dbDRIVER := os.Getenv("AUTH_DB_DRIVER")
-	if dbDRIVER == "" {
-		log.Fatal("missing db driver")
-	}
-
 	dbURL := os.Getenv("AUTH_DB_URL")
 	if dbURL == "" {
 		log.Fatal("misssing db url")
 	}
 
-	db, err := sql.Open(dbDRIVER, dbURL)
+	db, err := gorm.Open(postgres.Open(dbURL))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err = db.Ping(); err != nil {
-		log.Fatal("could not connection to user data base: ", err)
+	if err = db.AutoMigrate(&model.AuthInfo{}); err != nil {
+		log.Fatal(err)
 	}
 
 	return &DataBase{authInfo: repository.NewAuthInfoRepository(db)}

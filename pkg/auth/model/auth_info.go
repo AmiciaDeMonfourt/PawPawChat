@@ -6,11 +6,11 @@ import (
 )
 
 type AuthInfo struct {
-	UserID    uint64    `db:"user_id" json:"user_id"`
-	Email     string    `db:"email" json:"email"`
-	HashPass  string    `db:"hash_pass" json:"-"`
-	Password  string    `db:"-" json:"password"`
-	LastLogin time.Time `db:"last_login" json:"last_login"`
+	UserID    uint64    `gorm:"primaryKey;autoIncrement" json:"user_id"`
+	Email     string    `gorm:"type:varchar(64);unique;uniqueIndex;not null" json:"email"`
+	HashPass  string    `gorm:"type:text;not null" json:"-"`
+	Password  string    `json:"password"`
+	LastLogin time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP" json:"last_login"`
 }
 
 func NewAuthInfo(in any) *AuthInfo {

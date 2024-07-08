@@ -44,13 +44,22 @@ func Start() {
 		log.Fatal(err)
 	}
 
+	if err := authService.KafkaConsumer.Subscribe([]string{"users"}); err != nil {
+		log.Fatal(err)
+	}
+
+	authService.KafkaConsumer.Consume()
+	go authService.proccessMessage()
+
 	log.Printf("auth service server start at %s", authADDR)
 	if err = gRPCServer.Serve(l); err != nil {
 		log.Fatal(err)
 	}
+
 }
 
-func (s *authService) SignUp(ctx context.Context, req *auth.SignUpRequest) (*auth.SignUpResponse, error) {
+// depricated
+func (s *AuthService) SignUp(ctx context.Context, req *auth.SignUpRequest) (*auth.SignUpResponse, error) {
 	// Validate request
 	if err := validation.SignUpRequest(req); err != nil {
 		return &auth.SignUpResponse{Error: err.Error()}, nil

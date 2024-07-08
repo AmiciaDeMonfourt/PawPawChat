@@ -18,7 +18,7 @@ func newServer() *server {
 		log.Fatal(err)
 	}
 
-	router := router.New(client, producer.New())
+	router := router.New(client, producer.New("kafka:9092"))
 	router.Configure()
 
 	return &server{

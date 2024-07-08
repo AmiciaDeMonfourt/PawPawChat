@@ -108,58 +108,122 @@ CREATE       := create -ext=sql
 EXT          := sql
 VERBOSE 	 := down up
 
+MIGRATE_PATH   := pkg/${s}/database/migrations
+DB_CONN_LOCAL  := postgres://${PG_USER}:${PG_PASS}@localhost:5432/ppc_${s}?sslmode=disable
+DB_CONN_REMOTE := postgres://${PG_USER}:${PG_PASS}@${s}_db:5432/ppc_${s}?sslmode=disable
 
 migratenew:
 ifndef s
-	$(error parameter dir is missing s=[..])
+	$(error parameter s [service] is required)
 endif
 ifndef seq
-	$(error parameter sequence is missing seq=[..])
+	$(error parameter seq [suquence] is required)
 endif
-	@$(MIGR) $(CREATE) -ext=$(EXT) -dir=$(call FIND_SQL_PATH,./pkg/$(s))  -seq $(seq) 
+	$(MIGR) $(CREATE) -ext=$(EXT) -dir=${MIGRATE_PATH}  -seq $(seq) 
 
-
-
-SERVICE_ROOT_DIRS := \
-	$(wildcard ./pkg/*)
-
-PATH_TO_SERVICE_WITH_MIGR := \
-	$(foreach root,$(SERVICE_ROOT_DIRS),$(call HAS_SQL_FILES,$(root)))
-
-SERVICE_WITH_MIGR := \
-	$(foreach path, ${PATH_TO_SERVICE_WITH_MIGR}, $(notdir ${path}))
-
-SERVICE_MIGR_DIRS := \
-	$(foreach root,$(SERVICE_ROOT_DIRS),$(call FIND_SQL_PATH,$(root)))
-
-SERVICE_DB_URLS := \
-	$(foreach service, ${SERVICE_WITH_MIGR},$(call UPPER,${service})_DB_URL)
-
-SERVICES_WITH_MIGR_COUNT := $(words $(SERVICE_MIGR_DIRS))
-
-
-define MIGRATE_RUN
-	${MIGR} \
-	-path=$(word $(1),$(SERVICE_MIGR_DIRS)) \
-	-database ${$(word $(1),$(SERVICE_DB_URLS))} \
-	-verbose $(2)
-endef
-
-define FORCE
-	${MIGR} \
-	-path=$(word $(1),$(SERVICE_MIGR_DIRS)) \
-	-database ${$(word $(1),$(SERVICE_DB_URLS))} \
-	force $(2)
-endef
 
 migrate:
-	@$(foreach n, $(shell seq $(SERVICES_WITH_MIGR_COUNT)), \
-		$(foreach v, $(VERBOSE), \
-			$(call MIGRATE_RUN, $(n), $(v));))
+ifndef s
+	@echo parameter s [service] is required
+	@exit 1
+endif
+ifndef v
+	@echo parameter v [verbose] is required
+	@exit 1
+endif
+ifndef remote
+	@echo "Running migration locally"
+	@${MIGR} -path=$(MIGRATE_PATH) -database=$(DB_CONN_LOCAL) -verbose $(v)
+endif
+	@echo "Running migration remotely"
+	@${MIGR} -path=$(MIGRATE_PATH) -database=$(DB_CONN_REMOTE) -verbose $(v)
+
 
 migrateforce:
-ifndef v
-	@echo "missing v=[..] parameter (version)"
+ifndef s
+	@echo parameter s [service] is required
+	@exit 1
 endif
-	@$(foreach n, $(shell seq $(SERVICES_WITH_MIGR_COUNT)), \
-		$(call FORCE, $(n), $(v));)
+ifndef v
+	@echo parameter v [version] is required
+	@exit 1
+endif
+ifndef remote
+	@echo "Force migrationn locally"
+	@${MIGR} -path=$(MIGRATE_PATH) -database=$(DB_CONN_LOCAL) -verbose $(v)
+endif
+	@echo "Force migration remotely"
+	@${MIGR} -path=$(MIGRATE_PATH) -database=$(DB_CONN_REMOTE) -verbose $(v)
+
+
+# depricated
+# SERVICE_ROOT_DIRS := \
+# 	$(wildcard ./pkg/*)
+
+# PATH_TO_SERVICE_WITH_MIGR := \
+# 	$(foreach root,$(SERVICE_ROOT_DIRS),$(call HAS_SQL_FILES,$(root)))
+
+# SERVICE_WITH_MIGR := \
+# 	$(foreach path, ${PATH_TO_SERVICE_WITH_MIGR}, $(notdir ${path}))
+
+# SERVICE_MIGR_DIRS := \
+# 	$(foreach root,$(SERVICE_ROOT_DIRS),$(call FIND_SQL_PATH,$(root)))
+
+# SERVICE_DB_URLS := \
+# 	$(foreach service, ${SERVICE_WITH_MIGR},$(call UPPER,${service})_DB_URL)
+
+# SERVICES_WITH_MIGR_COUNT := $(words $(SERVICE_MIGR_DIRS))
+
+
+# define MIGRATE_RUN
+# 	${MIGR} \
+# 	-path=$(word $(1),$(SERVICE_MIGR_DIRS)) \
+# 	-database ${$(word $(1),$(SERVICE_DB_URLS))} \
+# 	-verbose $(2)
+# endef
+
+# define FORCE
+# 	${MIGR} \
+# 	-path=$(word $(1),$(SERVICE_MIGR_DIRS)) \
+# 	-database ${$(word $(1),$(SERVICE_DB_URLS))} \
+# 	force $(2)
+# endef
+
+# migrate:
+# 	@$(foreach n, $(shell seq $(SERVICES_WITH_MIGR_COUNT)), \
+# 		$(foreach v, $(VERBOSE), \
+# 			$(call MIGRATE_RUN, $(n), $(v));))
+
+
+# ifndef v
+# 	@echo "missing v=[..] parameter (version)"
+# endif
+# 	@$(foreach n, $(shell seq $(SERVICES_WITH_MIGR_COUNT)), \
+# 		$(call FORCE, $(n), $(v));)
+
+############################################################################
+#DOCKER
+
+cbuild:
+ifndef c
+	@docker-compose up --build -d
+endif
+	@docker-compose up --build $(c) -d
+
+cstop:
+ifndef c
+	$(error xui)
+endif
+	@docker-compose stop ${c}
+
+cbash:
+ifndef c
+	$(error xui)
+endif
+	@docker-compose exec -it ${c} /bin/bash
+
+cdb:
+ifndef c
+	$(error xui)
+endif
+	psql -h ${c}_db -U ${PG_USER} -d ppc_${c}

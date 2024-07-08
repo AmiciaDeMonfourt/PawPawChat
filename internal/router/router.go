@@ -32,18 +32,29 @@ func New(gRPCClient *grpc.Client, producer *producer.Producer) *Router {
 	}
 }
 
+func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	var handler http.Handler = r.router
+
+	// run of middlewares
+	for idx := range r.middlewares {
+		handler = r.middlewares[idx](handler)
+	}
+
+	handler.ServeHTTP(w, req)
+}
+
 func (r *Router) Configure() {
-	r.router.PathPrefix("/swagger/").HandlerFunc(httpSwagger.WrapHandler)
+	r.configureSwagger()
 	r.configureMiddlewares()
 	r.configureUserRoutes()
+
+	r.producer.Logs()
 }
 
 func (r *Router) configureUserRoutes() {
 	r.router.HandleFunc("/signup", r.user.SignUp).Methods("POST")
 	r.router.HandleFunc("/signin", r.user.SignIn).Methods("POST")
-
 	r.router.HandleFunc("/api/user", middleware.Auth(r.gRPCClient, r.user.GetInfo)).Methods("GET")
-
 	r.router.HandleFunc("/{username}", middleware.Auth(r.gRPCClient, r.user.Profile)).Methods("GET")
 }
 
@@ -52,16 +63,11 @@ func (r *Router) configureMiddlewares() {
 	r.Use(middleware.Logging)
 }
 
-func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	var handler http.Handler = r.router
-
-	for idx := range r.middlewares {
-		handler = r.middlewares[idx](handler)
-	}
-
-	handler.ServeHTTP(w, req)
-}
-
 func (r *Router) Use(mw middleware.Middleware) {
 	r.middlewares = append(r.middlewares, mw)
+}
+
+func (r *Router) configureSwagger() {
+	r.router.PathPrefix("/swagger/").HandlerFunc(httpSwagger.WrapHandler)
+
 }

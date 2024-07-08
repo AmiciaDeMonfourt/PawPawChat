@@ -19,8 +19,6 @@ import (
 // @Failure      500  			{object}  response.HTTPError
 // @Router       /signup [post]
 func (r *userRoutes) SignUp(w http.ResponseWriter, req *http.Request) {
-	r.producer.Send()
-
 	signUpReq := &web.SignUpRequest{}
 
 	if err := json.NewDecoder(req.Body).Decode(&signUpReq); err != nil {
@@ -40,24 +38,29 @@ func (r *userRoutes) SignUp(w http.ResponseWriter, req *http.Request) {
 		Password:   signUpReq.Password,
 	}
 
-	authResp, err := r.gRPCClient.Auth().SignUp(context.TODO(), authSignUpReq)
-	if err != nil {
-		response.InternalErr(w, err.Error())
-		return
+	if err := r.producer.Send(authSignUpReq); err != nil {
+		response.BadReq(w, err.Error())
 	}
 
-	if authResp.GetError() != "" {
-		response.Conflict(w, authResp.GetError())
-		return
-	}
+	response.Created(w, authSignUpReq)
+	// authResp, err := r.gRPCClient.Auth().SignUp(context.TODO(), authSignUpReq)
+	// if err != nil {
+	// 	response.InternalErr(w, err.Error())
+	// 	return
+	// }
 
-	user := domain.NewUser(authResp)
-	if user == nil {
-		response.InternalErr(w, "failed to create a user model")
-		return
-	}
+	// if authResp.GetError() != "" {
+	// 	response.Conflict(w, authResp.GetError())
+	// 	return
+	// }
 
-	response.Created(w, web.SignUpResponse{User: *user})
+	// user := domain.NewUser(authResp)
+	// if user == nil {
+	// 	response.InternalErr(w, "failed to create a user model")
+	// 	return
+	// }
+
+	// response.Created(w, web.SignUpResponse{User: *user})
 }
 
 // @Summary      Sign in
